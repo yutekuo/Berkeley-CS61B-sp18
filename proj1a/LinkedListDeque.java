@@ -12,9 +12,9 @@
  */
 public class LinkedListDeque<T> {
     private class TNode {
-        public T item;
-        public TNode prev;
-        public TNode next;
+        private T item;
+        private TNode prev;
+        private TNode next;
 
         public TNode(T i, TNode p, TNode n) {
             item = i;
@@ -38,6 +38,7 @@ public class LinkedListDeque<T> {
      * Creates a deep copy of other.
      * @source https://www.youtube.com/watch?v=JNroRiEG7U4
      */
+    /*
     public LinkedListDeque(LinkedListDeque other) {
         size = 0;
         sentinel = new TNode(null, null, null);
@@ -48,6 +49,7 @@ public class LinkedListDeque<T> {
             addLast((T) other.get(i));
         }
     }
+    */
 
     /** Adds an item of type T to the front of the deque. */
     public void addFirst(T item) {
