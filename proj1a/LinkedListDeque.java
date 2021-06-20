@@ -34,9 +34,19 @@ public class LinkedListDeque<T> {
         sentinel.next = sentinel;
     }
 
-    /** Creates a deep copy of other. */
+    /**
+     * Creates a deep copy of other.
+     * @source https://www.youtube.com/watch?v=JNroRiEG7U4
+     */
     public LinkedListDeque(LinkedListDeque other) {
+        size = 0;
+        sentinel = new TNode(null, null, null);
+        sentinel.prev = sentinel;
+        sentinel.next = sentinel;
 
+        for (int i = 0; i < other.size(); i++) {
+            addLast((T) other.get(i));
+        }
     }
 
     /** Adds an item of type T to the front of the deque. */
@@ -113,10 +123,39 @@ public class LinkedListDeque<T> {
      * returns null. Must not alter the deque!
      */
     public T get(int index) {
-        return null;
+        if (size == 0 || index < 0 || index >= size) {
+            return null;
+        }
+
+        TNode p = sentinel;
+        int count = 0;
+        while (count < index + 1) {
+            p = p.next;
+            count++;
+        }
+        return p.item;
     }
 
+    private T getRecursiveHelper(TNode pointer, int index) {
+        TNode p = pointer;
+        if (index == 0) {
+            return p.next.item;
+        }
+
+        p = p.next;
+        return getRecursiveHelper(p, index - 1);
+    }
+
+    /** Same as get, but uses recursion. */
     public T getRecursive(int index) {
-        return null;
+        if (size == 0 || index < 0 || index >= size) {
+            return null;
+        }
+
+        if (index == 0) {
+            return sentinel.next.item;
+        }
+
+        return getRecursiveHelper(sentinel.next, index - 1);
     }
 }
