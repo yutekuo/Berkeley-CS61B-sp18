@@ -37,16 +37,33 @@ public class LinkedListDeque<T> {
 
     }
 
+    /** Helper function: Adds the first node to the list. */
+    private void addOne(T item) {
+        size = size + 1;
+        sentinel.next = new TNode(item, sentinel, sentinel);
+        sentinel.prev = sentinel.next;
+    }
+
     /** Adds an item of type T to the front of the deque. */
     public void addFirst(T item) {
+        if (size == 0) {
+            addOne(item);
+            return;
+        }
         size = size + 1;
         sentinel.next = new TNode(item, sentinel, sentinel.next);
+        sentinel.next.next.prev = sentinel.next;
     }
 
     /** Adds an item of type T to the back of the deque. */
     public void addLast(T item) {
+        if (size == 0) {
+            addOne(item);
+            return;
+        }
         size = size + 1;
         sentinel.prev = new TNode(item, sentinel.prev, sentinel);
+        sentinel.prev.prev.next = sentinel.prev;
     }
 
     /** Returns true if deque is empty, false otherwise. */
@@ -65,7 +82,12 @@ public class LinkedListDeque<T> {
      * print out a new line.
      */
     public void printDeque() {
-
+        TNode p = sentinel;
+        while (p.next != sentinel) {
+            p = p.next;
+            System.out.print(p.item + " ");
+        }
+        System.out.println();
     }
 
     /**
