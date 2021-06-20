@@ -29,7 +29,9 @@ public class LinkedListDeque<T> {
     /** Creates an empty linked list deque. */
     public LinkedListDeque() {
         size = 0;
-        sentinel = new TNode(null, sentinel, sentinel);
+        sentinel = new TNode(null, null, null);
+        sentinel.prev = sentinel;
+        sentinel.next = sentinel;
     }
 
     /** Creates a deep copy of other. */
@@ -37,19 +39,8 @@ public class LinkedListDeque<T> {
 
     }
 
-    /** Helper function: Adds the first node to the list. */
-    private void addOne(T item) {
-        size = size + 1;
-        sentinel.next = new TNode(item, sentinel, sentinel);
-        sentinel.prev = sentinel.next;
-    }
-
     /** Adds an item of type T to the front of the deque. */
     public void addFirst(T item) {
-        if (size == 0) {
-            addOne(item);
-            return;
-        }
         size = size + 1;
         sentinel.next = new TNode(item, sentinel, sentinel.next);
         sentinel.next.next.prev = sentinel.next;
@@ -57,10 +48,6 @@ public class LinkedListDeque<T> {
 
     /** Adds an item of type T to the back of the deque. */
     public void addLast(T item) {
-        if (size == 0) {
-            addOne(item);
-            return;
-        }
         size = size + 1;
         sentinel.prev = new TNode(item, sentinel.prev, sentinel);
         sentinel.prev.prev.next = sentinel.prev;
