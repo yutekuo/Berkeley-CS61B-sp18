@@ -26,6 +26,7 @@ public class ArrayDeque<T> {
     }
 
     /** Creates a deep copy of other. */
+    /*
     public ArrayDeque(ArrayDeque other) {
         items = (T[]) new Object[other.items.length];
         size = other.size;
@@ -33,6 +34,7 @@ public class ArrayDeque<T> {
         nextLast = other.nextLast;
         System.arraycopy(other.items, 0, items, 0, items.length);
     }
+    */
 
     /**
      * Invariants:
@@ -191,6 +193,10 @@ public class ArrayDeque<T> {
      * and so forth. If no such item exists, returns null. Must not alter the deque!
      */
     public T get(int index) {
-        return items[index];
+        if (isEmpty()) {
+            return null;
+        }
+
+        return items[addOne(nextFirst) + index];
     }
 }
