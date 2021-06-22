@@ -36,6 +36,15 @@ public class ArrayDeque<T> {
     }
     */
 
+    /** Returns the index immediately “before” a given index for a given array arr. */
+    private int resizeHelper(T[] arr, int index) {
+        index = index - 1;
+        if (index < 0) {
+            index = arr.length - 1;
+        }
+        return index;
+    }
+
     /**
      * Invariants:
      * 1. When addOne(nextLast) == nextFirst, we need to resize the array.
@@ -47,12 +56,14 @@ public class ArrayDeque<T> {
      */
     private void resize(int capacity) {
         T[] newArray = (T[]) new Object[capacity];
-        int index = minusOne(nextLast);
+        int oldIndex = minusOne(nextLast);
+        int newIndex = oldIndex;
         for (int i = 0; i < size; i++) {
-            newArray[index] = items[index];
-            index = minusOne(index);
+            newArray[newIndex] = items[oldIndex];
+            oldIndex = minusOne(oldIndex);
+            newIndex = resizeHelper(newArray, newIndex);
         }
-        nextFirst = index;
+        nextFirst = newIndex;
         items = newArray;
     }
     /** Returns true if addOne(nextLast) == nextFirst. */
@@ -75,7 +86,7 @@ public class ArrayDeque<T> {
         size = size + 1;
         nextFirst = minusOne(nextFirst);
         if (isFull()) {
-            resize(size * 2);
+            resize(items.length * 2);
         }
     }
 
@@ -94,7 +105,7 @@ public class ArrayDeque<T> {
         size = size + 1;
         nextLast = addOne(nextLast);
         if (isFull()) {
-            resize(size * 2);
+            resize(items.length * 2);
         }
     }
 
