@@ -171,7 +171,7 @@ public class ArrayDeque<T> {
         items[currentFirst] = null;
         nextFirst = currentFirst;
 
-        if (calcUsageRatio() < 0.25) {
+        if (items.length >= 16 && calcUsageRatio() < 0.25) {
             downsize(items.length / 2);
         }
 
@@ -192,7 +192,7 @@ public class ArrayDeque<T> {
         items[currentLast] = null;
         nextLast = currentLast;
 
-        if (calcUsageRatio() < 0.25) {
+        if (items.length >= 16 && calcUsageRatio() < 0.25) {
             downsize(items.length / 2);
         }
 
