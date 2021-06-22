@@ -37,7 +37,7 @@ public class ArrayDeque<T> {
     */
 
     /** Returns the index immediately “before” a given index for a given array arr. */
-    private int resizeHelper(T[] arr, int index) {
+    private int resizeMinusOne(T[] arr, int index) {
         index = index - 1;
         if (index < 0) {
             index = arr.length - 1;
@@ -57,15 +57,16 @@ public class ArrayDeque<T> {
     private void resize(int capacity) {
         T[] newArray = (T[]) new Object[capacity];
         int oldIndex = minusOne(nextLast);
-        int newIndex = oldIndex;
+        int newIndex = resizeMinusOne(newArray, nextLast);
         for (int i = 0; i < size; i++) {
             newArray[newIndex] = items[oldIndex];
             oldIndex = minusOne(oldIndex);
-            newIndex = resizeHelper(newArray, newIndex);
+            newIndex = resizeMinusOne(newArray, newIndex);
         }
         nextFirst = newIndex;
         items = newArray;
     }
+
     /** Returns true if addOne(nextLast) == nextFirst. */
     private boolean isFull() {
         return addOne(nextLast) == nextFirst;
