@@ -119,6 +119,31 @@ public class ArrayDeque<T> {
         System.out.println();
     }
 
+    /** Returns the usage ratio of an array. */
+    private double calcUsageRatio() {
+        double usageRatio = (double) size / items.length;
+        return usageRatio;
+    }
+
+    /**
+     * Invariants:
+     * 1. When usage ratio of an array of length 16 or more is below 25%, halve it.
+     * 2. Start copying elements from addOne(nextFirst) of larger array to index 1
+     *    of the smaller array.
+     * 3. After copying elements, set new nextFirst to 0 and new nextLast to size + 1.
+     */
+    private void downsize(int capacity) {
+        T[] newArray = (T[]) new Object[capacity];
+        int index = addOne(nextFirst);
+        for (int i = 0; i < size; i++) {
+            newArray[i + 1] = items[index];
+            index = addOne(index);
+        }
+        items = newArray;
+        nextFirst = 0;
+        nextLast = size + 1;
+    }
+
     /**
      * Removes and returns the item at the front of the deque. If no such item exists,
      * returns null.
@@ -132,6 +157,11 @@ public class ArrayDeque<T> {
         size = size - 1;
         items[currentFirst] = null;
         nextFirst = currentFirst;
+
+        if (calcUsageRatio() < 0.25) {
+            downsize(items.length / 2);
+        }
+
         return item;
     }
 
@@ -148,6 +178,11 @@ public class ArrayDeque<T> {
         size = size - 1;
         items[currentLast] = null;
         nextLast = currentLast;
+
+        if (calcUsageRatio() < 0.25) {
+            downsize(items.length / 2);
+        }
+
         return item;
     }
 
