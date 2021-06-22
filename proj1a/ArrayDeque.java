@@ -27,7 +27,11 @@ public class ArrayDeque<T> {
 
     /** Creates a deep copy of other. */
     public ArrayDeque(ArrayDeque other) {
-
+        items = (T[]) new Object[other.items.length];
+        size = other.size;
+        nextFirst = other.nextFirst;
+        nextLast = other.nextLast;
+        System.arraycopy(other.items, 0, items, 0, items.length);
     }
 
     /** Returns the index immediately “before” a given index. */
