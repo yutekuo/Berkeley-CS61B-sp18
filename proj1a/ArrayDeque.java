@@ -34,6 +34,30 @@ public class ArrayDeque<T> {
         System.arraycopy(other.items, 0, items, 0, items.length);
     }
 
+    /**
+     * Invariants:
+     * 1. When addOne(nextLast) == nextFirst, we need to resize the array.
+     * 2. The size of new array is twice than that of the old array.
+     * 3. nextLast will be same in both arrays.
+     * 4. Start copying the elements of old array to new array from minusOne(nextLast).
+     * 5. After we copy the last element of old array to new array, the new nextFirst will
+     *    be minusOne(the new index of the last element).
+     */
+    private void resize(int capacity) {
+        T[] newArray = (T[]) new Object[capacity];
+        int index = minusOne(nextLast);
+        for (int i = 0; i < size; i++) {
+            newArray[index] = items[index];
+            index = minusOne(index);
+        }
+        nextFirst = index;
+        items = newArray;
+    }
+    /** Returns true if addOne(nextLast) == nextFirst. */
+    private boolean isFull() {
+        return addOne(nextLast) == nextFirst;
+    }
+
     /** Returns the index immediately “before” a given index. */
     private int minusOne(int index) {
         index = index - 1;
@@ -48,6 +72,9 @@ public class ArrayDeque<T> {
         items[nextFirst] = item;
         size = size + 1;
         nextFirst = minusOne(nextFirst);
+        if (isFull()) {
+            resize(size * 2);
+        }
     }
 
     /** Returns the index immediately “after” a given index. */
@@ -64,14 +91,14 @@ public class ArrayDeque<T> {
         items[nextLast] = item;
         size = size + 1;
         nextLast = addOne(nextLast);
+        if (isFull()) {
+            resize(size * 2);
+        }
     }
 
     /** Returns true if deque is empty, false otherwise. */
     public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        }
-        return false;
+        return size == 0;
     }
 
     /** Returns the number of items in the deque. */
