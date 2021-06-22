@@ -197,6 +197,11 @@ public class ArrayDeque<T> {
             return null;
         }
 
-        return items[addOne(nextFirst) + index];
+        int itemIndex = addOne(nextFirst);
+        for (int i = 0; i < index; i++) {
+            itemIndex = addOne(itemIndex);
+        }
+
+        return items[itemIndex];
     }
 }
