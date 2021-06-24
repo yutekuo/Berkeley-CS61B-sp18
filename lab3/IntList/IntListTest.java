@@ -3,6 +3,24 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class IntListTest {
+    /** Test a reverse method. */
+    @Test
+    public void testReverse() {
+        // Does the function return a reversed list?
+        IntList input = IntList.of(1, 2, 3);
+        IntList actual = IntList.reverse(input);
+        IntList expected = IntList.of(3, 2, 1);
+        assertEquals(expected, actual);
+
+        // Is the function destructive?
+        IntList unexpected = IntList.of(1, 2, 3);
+        assertNotEquals(unexpected, input);
+
+        // Does the method handle a null input properly?
+        IntList input3 = null;
+        IntList actual3 = IntList.reverse(input3);
+        assertEquals(null, actual3);
+    }
 
     /**
      * Example test that verifies correctness of the IntList.of static
