@@ -10,4 +10,23 @@ public class Palindrome {
         }
         return deque;
     }
+
+    /** Recursively checks whether a deque is a palindrome or not. */
+    private boolean isPalindromeHelper(Deque<Character> deque) {
+        if (deque.isEmpty() || deque.size() == 1) {
+            return true;
+        }
+
+        if (deque.removeFirst() != deque.removeLast()) {
+            return false;
+        }
+
+        return isPalindromeHelper(deque);
+    }
+
+    /** Returns true if the given word is a palindrome, and false otherwise. */
+    public boolean isPalindrome(String word) {
+        Deque<Character> deque = wordToDeque(word);
+        return isPalindromeHelper(deque);
+    }
 }
