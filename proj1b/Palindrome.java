@@ -29,4 +29,29 @@ public class Palindrome {
         Deque<Character> deque = wordToDeque(word);
         return isPalindromeHelper(deque);
     }
+
+    /**
+     * Recursively checks whether a deque is a palindrome or not according to the character
+     * comparison test provided by the CharacterComparator passed in as argument cc.
+     */
+    private boolean isOffByOnePalindromeHelper(Deque<Character> deque, CharacterComparator cc) {
+        if (deque.isEmpty() || deque.size() == 1) {
+            return true;
+        }
+
+        if (!cc.equalChars(deque.removeFirst(), deque.removeLast())) {
+            return false;
+        }
+
+        return isOffByOnePalindromeHelper(deque, cc);
+    }
+
+    /**
+     * Returns true if the word is a palindrome according to the character
+     * comparison test provided by the CharacterComparator passed in as argument cc.
+     */
+    public boolean isPalindrome(String word, CharacterComparator cc) {
+        Deque<Character> deque = wordToDeque(word);
+        return isOffByOnePalindromeHelper(deque, cc);
+    }
 }
