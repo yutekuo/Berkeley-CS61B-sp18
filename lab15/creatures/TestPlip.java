@@ -10,7 +10,7 @@ import huglife.Impassible;
 import huglife.Empty;
 
 /** Tests the plip class   
- *  @authr FIXME
+ *  @author Yu Te Kuo
  */
 
 public class TestPlip {
