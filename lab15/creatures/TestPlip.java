@@ -47,7 +47,7 @@ public class TestPlip {
         assertEquals(0.5, plip3.energy(), 0.01);
     }
 
-    //@Test
+    @Test
     public void testChoose() {
         Plip p = new Plip(1.2);
         HashMap<Direction, Occupant> surrounded = new HashMap<Direction, Occupant>();

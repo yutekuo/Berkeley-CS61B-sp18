@@ -93,6 +93,24 @@ public class Plip extends Creature {
      *  for an example to follow.
      */
     public Action chooseAction(Map<Direction, Occupant> neighbors) {
+        List<Direction> empties = getNeighborsOfType(neighbors, "empty");
+        if (empties.size() == 0) {
+            return new Action(Action.ActionType.STAY);
+        }
+
+        if (energy >= 1) {
+            Direction replicateDir = HugLifeUtils.randomEntry(empties);
+            return new Action(Action.ActionType.REPLICATE, replicateDir);
+        }
+
+        List<Direction> cloruses = getNeighborsOfType(neighbors, "clorus");
+        if (cloruses.size() > 0) {
+            if (HugLifeUtils.random() < 0.5) {
+                Direction moveDir = HugLifeUtils.randomEntry(empties);
+                return new Action(Action.ActionType.MOVE, moveDir);
+            }
+        }
+
         return new Action(Action.ActionType.STAY);
     }
 
