@@ -30,7 +30,7 @@ public class TestClorus {
     public void testChooseAction() {
         // Test: If there are no empty squares, the Clorus will STAY.
         Clorus clorus = new Clorus(10);
- /*       HashMap<Direction, Occupant> surrounded = new HashMap<>();
+        HashMap<Direction, Occupant> surrounded = new HashMap<>();
         surrounded.put(Direction.TOP, new Impassible());
         surrounded.put(Direction.BOTTOM, new Impassible());
         surrounded.put(Direction.LEFT, new Impassible());
