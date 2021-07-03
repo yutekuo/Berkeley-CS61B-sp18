@@ -77,7 +77,9 @@ public class Plip extends Creature {
      *  Plip.
      */
     public Plip replicate() {
-        return this;
+        this.energy = this.energy * 0.5;
+        Plip offspring = new Plip(this.energy);
+        return offspring;
     }
 
     /** Plips take exactly the following actions based on NEIGHBORS:
