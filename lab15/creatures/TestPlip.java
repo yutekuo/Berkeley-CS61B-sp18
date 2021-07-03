@@ -36,15 +36,15 @@ public class TestPlip {
 
     @Test
     public void testReplicate() {
-        Plip plip1 = new Plip();
+        Plip plip1 = new Plip(2);
         Plip plip2 = plip1.replicate();
         assertNotSame(plip2, plip1);
-        assertEquals(0.5, plip1.energy(), 0);
-        assertEquals(0.5, plip2.energy(), 0);
+        assertEquals(1.0, plip1.energy(), 0);
+        assertEquals(1.0, plip2.energy(), 0);
 
         Plip plip3 = plip1.replicate();
-        assertEquals(0.25, plip1.energy(), 0);
-        assertEquals(0.25, plip3.energy(), 0);
+        assertEquals(0.5, plip1.energy(), 0);
+        assertEquals(0.5, plip3.energy(), 0);
     }
 
     //@Test
