@@ -77,20 +77,23 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
 
     private class ArrayRingBufferIterator implements Iterator<T> {
         private int currentPos;
+        private int count;
 
         ArrayRingBufferIterator() {
             currentPos = first;
+            count = 0;
         }
 
         @Override
         public boolean hasNext() {
-            return !isEmpty();
+            return count < capacity;
         }
 
         @Override
         public T next() {
             T currentItem = rb[currentPos];
-            addOne(currentPos);
+            currentPos = addOne(currentPos);
+            count++;
             return currentItem;
         }
     }
