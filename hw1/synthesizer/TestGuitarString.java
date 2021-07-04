@@ -12,18 +12,17 @@ import static org.junit.Assert.*;
  */
 
 public class TestGuitarString {
-/*    @Test
+    @Test
     public void testPluckTheAString() {
-        double CONCERT_A = 440.0;
-        GuitarString aString = new GuitarString(CONCERT_A);
+        double concertA = 440.0;
+        GuitarString aString = new GuitarString(concertA);
         aString.pluck();
         for (int i = 0; i < 50000; i += 1) {
             StdAudio.play(aString.sample());
             aString.tic();
         }
-    }*/
+    }
 
-/*
     @Test
     public void testTic() {
         // Create a GuitarString of frequency 11025, which
@@ -50,9 +49,7 @@ public class TestGuitarString {
         // See JUnit documentation for a description of how tolerances work
         // for assertEquals(double, double)
         assertEquals(expected, s5, 0.001);
-
     }
-*/
 
     /** Calls tests for GuitarString. */
     public static void main(String[] args) {

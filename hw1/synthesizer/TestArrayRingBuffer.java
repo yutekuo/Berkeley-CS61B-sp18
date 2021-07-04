@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 public class TestArrayRingBuffer {
     @Test
-    public void testBasics() {
+    public void test() {
         ArrayRingBuffer<Integer> arb = new ArrayRingBuffer<>(4);
         assertTrue(arb.isEmpty());
         assertFalse(arb.isFull());
