@@ -66,8 +66,7 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
         if (isEmpty()) {
             throw new RuntimeException("Ring buffer underflow");
         }
-        T oldestItem = rb[first];
-        return oldestItem;
+        return rb[first];
     }
 
     /** Return an iterator. */
@@ -77,10 +76,10 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
     }
 
     private class ArrayRingBufferIterator implements Iterator<T> {
-        private int nextPos;
+        private int currentPos;
 
         ArrayRingBufferIterator() {
-            nextPos = first;
+            currentPos = first;
         }
 
         @Override
@@ -90,9 +89,9 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T> {
 
         @Override
         public T next() {
-            T nextItem = peek();
-            addOne(nextPos);
-            return nextItem;
+            T currentItem = rb[currentPos];
+            addOne(currentPos);
+            return currentItem;
         }
     }
 }
