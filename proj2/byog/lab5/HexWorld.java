@@ -1,19 +1,17 @@
 package byog.lab5;
-import org.junit.Test;
-import static org.junit.Assert.*;
-
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
-
 import java.util.Random;
 
 /**
  * Draws a world consisting of hexagonal regions.
  */
 public class HexWorld {
-    private static final int WIDTH = 50;
-    private static final int HEIGHT = 50;
+    private static final int WIDTH = 35;
+    private static final int HEIGHT = 35;
+    private static final long SEED = 12345;
+    private static final Random RANDOM = new Random(SEED);
 
     /** Shows the position of the lower left corner of the hexagon. */
     public static class Position {
@@ -28,9 +26,9 @@ public class HexWorld {
 
     /**
      * Computes the width of row i for a size s hexagon.
-     * @param s The size of the hex
-     * @param i The row number where i = 0 is the bottom row
-     * @return the width of row i
+     * @param s The size of the hex.
+     * @param i The row number where i = 0 is the bottom row.
+     * @return the width of row i.
      *
      * The width of row i = s + 2 * i, for i = 0 ~ s-1;
      *                    = s + 2 * (2s - 1 - i), for i = s ~ 2s-1.
@@ -57,8 +55,8 @@ public class HexWorld {
      *  xxxxxx
      *   xxxx
      *
-     * @param s size of the hexagon
-     * @param i row num of the hexagon, where i = 0 is the bottom
+     * @param s size of the hexagon.
+     * @param i row num of the hexagon, where i = 0 is the bottom.
      * @return the relative x coordinate of the leftmost tile in the ith
      * row of a hexagon, assuming that the bottom row has an x-coordinate
      * of zero.
@@ -77,10 +75,10 @@ public class HexWorld {
     }
 
     /** Adds a row of the same tile.
-     * @param world the world to draw on
-     * @param p the leftmost position of the row
-     * @param width the number of tiles wide to draw
-     * @param t the tile to draw
+     * @param world the world to draw on.
+     * @param p the leftmost position of the row.
+     * @param width the number of tiles wide to draw.
+     * @param t the tile to draw.
      */
     public static void addRow(TETile[][] world, Position p, int width, TETile t) {
         for (int i = 0; i < width; i++) {
@@ -114,30 +112,49 @@ public class HexWorld {
         }
     }
 
-    @Test
-    public void testHexRowWidth() {
-        assertEquals(4, hexRowWidth(4, 0));
-        assertEquals(6, hexRowWidth(4, 1));
-        assertEquals(8, hexRowWidth(4, 2));
-        assertEquals(10, hexRowWidth(4, 3));
-        assertEquals(10, hexRowWidth(4, 4));
-        assertEquals(8, hexRowWidth(4, 5));
-        assertEquals(6, hexRowWidth(4, 6));
-        assertEquals(4, hexRowWidth(4, 7));
+    /** Computes the top-right position of a current hexagon’s neighbor. */
+    public static Position topRightNeighbor(Position hexagon) {
+        Position neighbor = new Position(hexagon.x + 5, hexagon.y + 3);
+        return neighbor;
     }
 
-    @Test
-    public void testHexRowOffset() {
-        assertEquals(0, hexRowOffset(3, 5));
-        assertEquals(-1, hexRowOffset(3, 4));
-        assertEquals(-2, hexRowOffset(3, 3));
-        assertEquals(-2, hexRowOffset(3, 2));
-        assertEquals(-1, hexRowOffset(3, 1));
-        assertEquals(0, hexRowOffset(3, 0));
-        assertEquals(0, hexRowOffset(2, 0));
-        assertEquals(-1, hexRowOffset(2, 1));
-        assertEquals(-1, hexRowOffset(2, 2));
-        assertEquals(0, hexRowOffset(2, 3));
+    /** Computes the bottom-right position of a current hexagon’s neighbor. */
+    public static Position bottomRightNeighbor(Position hexagon) {
+        Position neighbor = new Position(hexagon.x + 5, hexagon.y - 3);
+        return neighbor;
+    }
+
+    /** Picks a RANDOM tile with 20% change of being
+     *  a grass, 20% chance of being a flower, 20%
+     *  chance of being a tree, 20% chance of being a mountain,
+     *  and 20% chance of being a locked door.
+     */
+    private static TETile randomTile() {
+        int tileNum = RANDOM.nextInt(5);
+        switch (tileNum) {
+            case 0: return Tileset.GRASS;
+            case 1: return Tileset.FLOWER;
+            case 2: return Tileset.TREE;
+            case 3: return Tileset.MOUNTAIN;
+            case 4: return Tileset.LOCKED_DOOR;
+            default: return Tileset.NOTHING;
+        }
+    }
+
+    /**
+     * Draws a column of N hexes, each one with a random biome.
+     * @param world the world to draw on.
+     * @param p the lower left corner of the hexagon at the bottom of a column.
+     * @param s side length of a hexagon.
+     * @param N number of hexes in a column.
+     */
+    public static void drawRandomVerticalHexes(TETile[][] world, Position p,
+                                               int s, int N) {
+        for (int i = 0; i < N; i++) {
+            TETile t = randomTile();
+            addHexagon(world, p, s, t);
+            p.y += 6;
+        }
     }
 
     public static void main(String[] args) {
@@ -152,7 +169,22 @@ public class HexWorld {
                 hexWorld[x][y] = Tileset.NOTHING;
             }
         }
-        addHexagon(hexWorld, new Position(25, 25), 4, Tileset.FLOWER);
+
+        int[] nArray = {3, 4, 5, 4, 3};
+        int count = 0;
+        Position currentColumnStart = new Position(4, 10);
+        for (int N : nArray) {
+            if (count < 2) {
+                Position nextColumnStart = bottomRightNeighbor(currentColumnStart);
+                drawRandomVerticalHexes(hexWorld, currentColumnStart, 3, N);
+                currentColumnStart = nextColumnStart;
+            } else {
+                Position nextColumnStart = topRightNeighbor(currentColumnStart);
+                drawRandomVerticalHexes(hexWorld, currentColumnStart, 3, N);
+                currentColumnStart = nextColumnStart;
+            }
+            count++;
+        }
 
         // Draw the world to the screen.
         ter.renderFrame(hexWorld);
