@@ -35,7 +35,7 @@ public class Game {
         final long SEED = 12345;
         World worldMap = new World(WIDTH, HEIGHT, SEED);
         worldMap.fillWithNothing();
-        worldMap.addOneRoom();
+        worldMap.addManyRooms();
 
         // Draw the world on the screen.
         ter.renderFrame(worldMap.getWorld());

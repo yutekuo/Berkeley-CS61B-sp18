@@ -13,6 +13,7 @@ public class World {
     private final Random random;
     private ArrayList<Room> existingRooms = new ArrayList<>();
     private final int roomMaxSize = 15;
+    private final int maxRoomNumbers = 20;
 
     public World(int w, int h, long s) {
         width = w;
@@ -20,6 +21,17 @@ public class World {
         seed = s;
         random = new Random(seed);
         world = new TETile[width][height];
+    }
+
+    /**
+     * Adds random number of rooms to the world. There should be 10 ~ maxRoomNumbers rooms
+     * in the world.
+     */
+    public void addManyRooms() {
+        int numberOfRooms = RandomUtils.uniform(random, 10, maxRoomNumbers + 1);
+        for (int i = 0; i < numberOfRooms; i++) {
+            addOneRoom();
+        }
     }
 
     /**
@@ -35,7 +47,7 @@ public class World {
      *      #..#
      *      ####
      */
-    public void addOneRoom() {
+    private void addOneRoom() {
         Room room = roomGenerator();
         existingRooms.add(room);
         createOneRoom(room.getWidth(), room.getHeight(), room.getPosition());
