@@ -9,6 +9,10 @@ public class Game {
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
 
+    public Game() {
+        ter.initialize(WIDTH, HEIGHT);
+    }
+
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
      */
@@ -28,11 +32,12 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
-        // TODO: Fill out this method to run the game using the input passed in,
-        // and return a 2D tile representation of the world that would have been
-        // drawn if the same inputs had been given to playWithKeyboard().
+        World worldMap = new World(WIDTH, HEIGHT);
+        worldMap.fillWithNothing();
+        worldMap.addOneRoom();
 
-        TETile[][] finalWorldFrame = null;
-        return finalWorldFrame;
+        // Draw the world on the screen.
+        ter.renderFrame(worldMap.getWorld());
+        return worldMap.getWorld();
     }
 }
