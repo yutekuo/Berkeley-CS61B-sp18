@@ -9,23 +9,29 @@ public class World {
     private TETile[][] world;
     private final int width;
     private final int height;
+    private final long seed;
+    private final Random random;
     private ArrayList<Room> existingRooms = new ArrayList<>();
+    private final int roomMaxSize = 15;
 
-    public World(int w, int h) {
+    public World(int w, int h, long s) {
         width = w;
         height = h;
+        seed = s;
+        random = new Random(seed);
         world = new TETile[width][height];
     }
 
     /**
      * Adds a rectangle room with random width and height to a random location in the world.
      *
-     * A room should have both width and height greater than or equal to 3.
-     * e.g., the room with width = 5 and height = 4. ('#' means wall and '.' means floor)
-     *      #####
-     *      #...#
-     *      #...#
-     *      #####
+     * A room should have both width and height greater than or equal to 4 and smaller than
+     * or equal to roomMaxSize.
+     * e.g., the smallest room. ('#' means wall and '.' means floor)
+     *      ####
+     *      #..#
+     *      #..#
+     *      ####
      */
     public void addOneRoom() {
         Position roomPosition = getRandomPosition();
@@ -65,18 +71,24 @@ public class World {
 
     /** Return a random integer length which can be used as the width of a room. */
     private int getRandomRoomWidth(int widthBound) {
-        return RandomUtils.uniform(new Random(), 3, widthBound + 1);
+        if (widthBound > roomMaxSize) {
+            widthBound = roomMaxSize;
+        }
+        return RandomUtils.uniform(random, 4, widthBound + 1);
     }
 
     /** Return a random integer length which can be used as the height of a room. */
     private int getRandomRoomHeight(int heightBound) {
-        return RandomUtils.uniform(new Random(), 3, heightBound + 1);
+        if (heightBound > roomMaxSize) {
+            heightBound = roomMaxSize;
+        }
+        return RandomUtils.uniform(random, 4, heightBound + 1);
     }
 
     /** Return a random position. */
     private Position getRandomPosition() {
-        int x = RandomUtils.uniform(new Random(), 0, width - 2);
-        int y = RandomUtils.uniform(new Random(), 0, height - 2);
+        int x = RandomUtils.uniform(random, 0, width - 3);
+        int y = RandomUtils.uniform(random, 0, height - 3);
         return new Position(x, y);
     }
 

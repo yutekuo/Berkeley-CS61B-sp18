@@ -32,7 +32,8 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
-        World worldMap = new World(WIDTH, HEIGHT);
+        final long SEED = 12345;
+        World worldMap = new World(WIDTH, HEIGHT, SEED);
         worldMap.fillWithNothing();
         worldMap.addOneRoom();
 
