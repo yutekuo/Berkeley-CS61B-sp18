@@ -12,8 +12,10 @@ public class World {
     private final long seed;
     private final Random random;
     private ArrayList<Room> existingRooms = new ArrayList<>();
-    private final int roomMaxSize = 15;
-    private final int maxRoomNumbers = 20;
+    private final int minRoomSize = 4;
+    private final int maxRoomSize = 15;
+    private final int minRoomNumbers = 15;
+    private final int maxRoomNumbers = 25;
 
     public World(int w, int h, long s) {
         width = w;
@@ -24,11 +26,11 @@ public class World {
     }
 
     /**
-     * Adds random number of rooms to the world. There should be 10 ~ maxRoomNumbers rooms
-     * in the world.
+     * Adds random number of rooms to the world. There should be minRoomNumbers ~
+     * maxRoomNumbers rooms in the world.
      */
     public void addManyRooms() {
-        int numberOfRooms = RandomUtils.uniform(random, 10, maxRoomNumbers + 1);
+        int numberOfRooms = RandomUtils.uniform(random, minRoomNumbers, maxRoomNumbers + 1);
         for (int i = 0; i < numberOfRooms; i++) {
             addOneRoom();
         }
@@ -39,8 +41,8 @@ public class World {
      *
      * @return the room that is added to the world.
      *
-     * A room should have both width and height greater than or equal to 4 and smaller than
-     * or equal to roomMaxSize.
+     * A room should have both width and height greater than or equal to minRoomSize and smaller than
+     * or equal to maxRoomSize.
      * e.g., the smallest room. ('#' means wall and '.' means floor)
      *      ####
      *      #..#
@@ -164,18 +166,18 @@ public class World {
 
     /** Return a random integer length which can be used as the width of a room. */
     private int getRandomRoomWidth(int widthBound) {
-        if (widthBound > roomMaxSize) {
-            widthBound = roomMaxSize;
+        if (widthBound > maxRoomSize) {
+            widthBound = maxRoomSize;
         }
-        return RandomUtils.uniform(random, 4, widthBound + 1);
+        return RandomUtils.uniform(random, minRoomSize, widthBound + 1);
     }
 
     /** Return a random integer length which can be used as the height of a room. */
     private int getRandomRoomHeight(int heightBound) {
-        if (heightBound > roomMaxSize) {
-            heightBound = roomMaxSize;
+        if (heightBound > maxRoomSize) {
+            heightBound = maxRoomSize;
         }
-        return RandomUtils.uniform(random, 4, heightBound + 1);
+        return RandomUtils.uniform(random, minRoomSize, heightBound + 1);
     }
 
     /** Return a random position. */
