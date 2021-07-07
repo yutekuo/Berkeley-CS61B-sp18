@@ -9,9 +9,9 @@ public class Game {
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
 
-    public Game() {
+    /*public Game() {
         ter.initialize(WIDTH, HEIGHT);
-    }
+    }*/
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
