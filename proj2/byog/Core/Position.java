@@ -17,4 +17,10 @@ public class Position {
     public int getY() {
         return y;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder returnSB = new StringBuilder("(" + x + ", " + y + ")");
+        return returnSB.toString();
+    }
 }

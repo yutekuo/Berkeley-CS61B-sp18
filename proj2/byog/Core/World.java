@@ -13,9 +13,9 @@ public class World {
     private final Random random;
     private ArrayList<Room> existingRooms = new ArrayList<>();
     private final int minRoomSize = 4;
-    private final int maxRoomSize = 15;
-    private final int minRoomNumbers = 15;
-    private final int maxRoomNumbers = 25;
+    private final int maxRoomSize = 14;
+    private final int minRoomNumbers = 10;
+    private final int maxRoomNumbers = 20;
 
     public World(int w, int h, long s) {
         width = w;
@@ -23,6 +23,118 @@ public class World {
         seed = s;
         random = new Random(seed);
         world = new TETile[width][height];
+    }
+
+    /** Adds hallways to all of the nearby rooms in the existing room list. */
+    public void addHallways() {
+        sortExistingRooms();
+        for (int i = 0; i < existingRooms.size() - 1; i++) {
+            Room currentRoom = existingRooms.get(i);
+            Room nextRoom = existingRooms.get(i + 1);
+        }
+    }
+
+    /**
+     * Draw a L-shape hallway, which can be used to connect two positions
+     * that have different x- and y- coordinates.
+     * Position p1's x coordinate will always be smaller than or equal to p2's.
+     */
+    public void drawLShapeHallway(Position p1, Position p2) {
+        // L-shape hallway can have four cases, each locates at one of the four corners.
+        if (p1.getY() < p2.getY()) {
+            // Case 1: upper-left corner
+            Position upperLeftCorner = new Position(p1.getX(), p2.getY());
+            drawVerticalHallway(p1, upperLeftCorner);
+            drawHorizontalHallway(upperLeftCorner, p2);
+            world[p1.getX()][p2.getY() - 1] = Tileset.FLOOR;
+
+            // Case 2: bottom-right corner
+            Position bottomRightCorner = new Position(p2.getX(), p1.getY());
+            drawHorizontalHallway(p1, bottomRightCorner);
+            drawVerticalHallway(bottomRightCorner, p2);
+            world[p2.getX() - 1][p1.getY()] = Tileset.FLOOR;
+        } else {
+            // Case 3: upper-right corner
+            Position upperRightCorner = new Position(p2.getX(), p1.getY());
+            drawHorizontalHallway(p1, upperRightCorner);
+            drawVerticalHallway(upperRightCorner, p2);
+            world[p2.getX() - 1][p1.getY()] = Tileset.FLOOR;
+
+            // Case 4: bottom-left corner
+            Position bottomLeftCorner = new Position(p1.getX(), p2.getY());
+            drawVerticalHallway(p1, bottomLeftCorner);
+            drawHorizontalHallway(bottomLeftCorner, p2);
+            world[p1.getX()][p2.getY() + 1] = Tileset.FLOOR;
+        }
+    }
+
+    /**
+     * Draw a vertical hallway between position p1 and p2.
+     * p1 and p2 should have same x-position.
+     * e.g., a vertical hallway has width equals to 3, and one of p1 and p2
+     * is the position of the top floor, while the other is the bottom floor.
+     *          #.#
+     *          #.#
+     *          #.#
+     */
+    public void drawVerticalHallway(Position p1, Position p2) {
+        if (p1.getX() != p2.getX()) {
+            throw new IllegalArgumentException("Position " + p1
+                    + " and Position " + p2 + " should have same X-positions!");
+        }
+
+        if (p1.getY() > p2.getY()) {
+            int dy = p1.getY() - p2.getY();
+            for (int y = 0; y <= dy; y++) {
+                world[p1.getX()][p2.getY() + y] = Tileset.FLOOR;
+                world[p1.getX() - 1][p2.getY() + y] = Tileset.WALL;
+                world[p1.getX() + 1][p2.getY() + y] = Tileset.WALL;
+            }
+        } else {
+            int dy = p2.getY() - p1.getY();
+            for (int y = 0; y <= dy; y++) {
+                world[p1.getX()][p1.getY() + y] = Tileset.FLOOR;
+                world[p1.getX() - 1][p1.getY() + y] = Tileset.WALL;
+                world[p1.getX() + 1][p1.getY() + y] = Tileset.WALL;
+            }
+        }
+    }
+
+    /**
+     * Draw a horizontal hallway between position p1 and p2.
+     * p1 and p2 should have same y-position.
+     * e.g., a horizontal hallway has width equals to 3, and one of p1 and p2
+     * is the position of the left floor, while the other is the right floor.
+     *      #####
+     *      .....
+     *      #####
+     */
+    public void drawHorizontalHallway(Position p1, Position p2) {
+        if (p1.getY() != p2.getY()) {
+            throw new IllegalArgumentException("Position " + p1
+                    + " and Position " + p2 + " should have same Y-positions!");
+        }
+
+        if (p1.getX() > p2.getX()) {
+            int dx = p1.getX() - p2.getX();
+            for (int x = 0; x <= dx; x++) {
+                world[p2.getX() + x][p1.getY()] = Tileset.FLOOR;
+                world[p2.getX() + x][p1.getY() - 1] = Tileset.WALL;
+                world[p2.getX() + x][p1.getY() + 1] = Tileset.WALL;
+            }
+        } else {
+            int dx = p2.getX() - p1.getX();
+            for (int x = 0; x <= dx; x++) {
+                world[p1.getX() + x][p1.getY()] = Tileset.FLOOR;
+                world[p1.getX() + x][p1.getY() - 1] = Tileset.WALL;
+                world[p1.getX() + x][p1.getY() + 1] = Tileset.WALL;
+            }
+        }
+    }
+
+    /** Sort existing room list according to each room's x position. */
+    private void sortExistingRooms() {
+        existingRooms.sort(Room::compareTo);
     }
 
     /**
@@ -39,10 +151,8 @@ public class World {
     /**
      * Adds a rectangle room with random width and height to a random location in the world.
      *
-     * @return the room that is added to the world.
-     *
-     * A room should have both width and height greater than or equal to minRoomSize and smaller than
-     * or equal to maxRoomSize.
+     * A room should have both width and height greater than or equal to minRoomSize
+     * and smaller than or equal to maxRoomSize.
      * e.g., the smallest room. ('#' means wall and '.' means floor)
      *      ####
      *      #..#
@@ -57,7 +167,7 @@ public class World {
 
     /** Returns a room which doesn't overlap any room in the existing room list. */
     private Room roomGenerator() {
-        Position roomPosition = getRandomPosition();
+        Position roomPosition = getRandomRoomPosition();
         int roomWidth = getRandomRoomWidth(width - roomPosition.getX());
         int roomHeight = getRandomRoomHeight(height - roomPosition.getY());
         Room room = new Room(roomWidth, roomHeight, roomPosition);
@@ -180,8 +290,8 @@ public class World {
         return RandomUtils.uniform(random, minRoomSize, heightBound + 1);
     }
 
-    /** Return a random position. */
-    private Position getRandomPosition() {
+    /** Return a random position of a room. */
+    private Position getRandomRoomPosition() {
         int x = RandomUtils.uniform(random, 0, width - 3);
         int y = RandomUtils.uniform(random, 0, height - 3);
         return new Position(x, y);
