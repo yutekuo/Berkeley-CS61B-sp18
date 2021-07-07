@@ -41,7 +41,7 @@ public class Game {
         worldMap.addHallways();
 
         // Draw the world on the screen.
-        ter.renderFrame(worldMap.getWorld());
+        //ter.renderFrame(worldMap.getWorld());
         return worldMap.getWorld();
     }
 }
