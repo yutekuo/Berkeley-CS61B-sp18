@@ -27,12 +27,28 @@ public class Room implements Comparable<Room> {
     }
 
     /**
-     * Return negative number if this's x position < other's x position.
-     * Return 0 if this's x position == other's x position.
-     * Return positive number if this's x position > other's x position.
+     * Return -1 if this's x position < other's x position.
+     * Return -1 if this's x position == other's x position and
+     * this's y position < other's y position.
+     * Return 1 if this's x position > other's x position.
      */
     @Override
     public int compareTo(Room other) {
-        return this.getPosition().getX() - other.getPosition().getX();
+        int thisX = this.getPosition().getX();
+        int thisY = this.getPosition().getY();
+        int otherX = other.getPosition().getX();
+        int otherY = other.getPosition().getY();
+
+        if (thisX < otherX) {
+            return -1;
+        }
+
+        if (thisX == otherX) {
+            if (thisY < otherY) {
+                return -1;
+            }
+        }
+
+        return 1;
     }
 }

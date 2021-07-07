@@ -13,7 +13,7 @@ public class World {
     private final Random random;
     private ArrayList<Room> existingRooms = new ArrayList<>();
     private final int minRoomSize = 4;
-    private final int maxRoomSize = 14;
+    private final int maxRoomSize = 15;
     private final int minRoomNumbers = 10;
     private final int maxRoomNumbers = 20;
 
@@ -30,7 +30,35 @@ public class World {
         sortExistingRooms();
         for (int i = 0; i < existingRooms.size() - 1; i++) {
             Room currentRoom = existingRooms.get(i);
+            int currentRoomX = currentRoom.getPosition().getX();
+            int currentRoomY = currentRoom.getPosition().getY();
+            int x1 = RandomUtils.uniform(random, currentRoomX + 1,
+                    currentRoomX + currentRoom.getWidth() - 1);
+            int y1 = RandomUtils.uniform(random, currentRoomY + 1,
+                    currentRoomY + currentRoom.getHeight() - 1);
+            Position p1 = new Position(x1, y1);
+
             Room nextRoom = existingRooms.get(i + 1);
+            int nextRoomX = nextRoom.getPosition().getX();
+            int nextRoomY = nextRoom.getPosition().getY();
+            int x2 = RandomUtils.uniform(random, nextRoomX + 1,
+                    nextRoomX + nextRoom.getWidth() - 1);
+            int y2 = RandomUtils.uniform(random, nextRoomY + 1,
+                    nextRoomY + nextRoom.getHeight() - 1);
+            Position p2 = new Position(x2, y2);
+
+            drawHallway(p1, p2);
+        }
+    }
+
+    /** Given two arbitrary positions, draw a hallway to connect them. */
+    private void drawHallway(Position p1, Position p2) {
+        if (p1.getX() == p2.getX()) {
+            drawVerticalHallway(p1, p2);
+        } else if (p1.getY() == p2.getY()) {
+            drawHorizontalHallway(p1, p2);
+        } else {
+            drawLShapeHallway(p1, p2);
         }
     }
 
@@ -39,32 +67,21 @@ public class World {
      * that have different x- and y- coordinates.
      * Position p1's x coordinate will always be smaller than or equal to p2's.
      */
-    public void drawLShapeHallway(Position p1, Position p2) {
-        // L-shape hallway can have four cases, each locates at one of the four corners.
+    private void drawLShapeHallway(Position p1, Position p2) {
         if (p1.getY() < p2.getY()) {
-            // Case 1: upper-left corner
-            Position upperLeftCorner = new Position(p1.getX(), p2.getY());
-            drawVerticalHallway(p1, upperLeftCorner);
-            drawHorizontalHallway(upperLeftCorner, p2);
-            world[p1.getX()][p2.getY() - 1] = Tileset.FLOOR;
-
-            // Case 2: bottom-right corner
             Position bottomRightCorner = new Position(p2.getX(), p1.getY());
             drawHorizontalHallway(p1, bottomRightCorner);
             drawVerticalHallway(bottomRightCorner, p2);
-            world[p2.getX() - 1][p1.getY()] = Tileset.FLOOR;
+            if (world[p2.getX() + 1][p1.getY() - 1] != Tileset.FLOOR) {
+                world[p2.getX() + 1][p1.getY() - 1] = Tileset.WALL;
+            }
         } else {
-            // Case 3: upper-right corner
-            Position upperRightCorner = new Position(p2.getX(), p1.getY());
-            drawHorizontalHallway(p1, upperRightCorner);
-            drawVerticalHallway(upperRightCorner, p2);
-            world[p2.getX() - 1][p1.getY()] = Tileset.FLOOR;
-
-            // Case 4: bottom-left corner
             Position bottomLeftCorner = new Position(p1.getX(), p2.getY());
             drawVerticalHallway(p1, bottomLeftCorner);
             drawHorizontalHallway(bottomLeftCorner, p2);
-            world[p1.getX()][p2.getY() + 1] = Tileset.FLOOR;
+            if (world[p1.getX() - 1][p2.getY() - 1] != Tileset.FLOOR) {
+                world[p1.getX() - 1][p2.getY() - 1] = Tileset.WALL;
+            }
         }
     }
 
@@ -77,7 +94,7 @@ public class World {
      *          #.#
      *          #.#
      */
-    public void drawVerticalHallway(Position p1, Position p2) {
+    private void drawVerticalHallway(Position p1, Position p2) {
         if (p1.getX() != p2.getX()) {
             throw new IllegalArgumentException("Position " + p1
                     + " and Position " + p2 + " should have same X-positions!");
@@ -87,15 +104,25 @@ public class World {
             int dy = p1.getY() - p2.getY();
             for (int y = 0; y <= dy; y++) {
                 world[p1.getX()][p2.getY() + y] = Tileset.FLOOR;
-                world[p1.getX() - 1][p2.getY() + y] = Tileset.WALL;
-                world[p1.getX() + 1][p2.getY() + y] = Tileset.WALL;
+                if (world[p1.getX() - 1][p2.getY() + y] != Tileset.FLOOR) {
+                    world[p1.getX() - 1][p2.getY() + y] = Tileset.WALL;
+                }
+
+                if (world[p1.getX() + 1][p2.getY() + y] != Tileset.FLOOR) {
+                    world[p1.getX() + 1][p2.getY() + y] = Tileset.WALL;
+                }
             }
         } else {
             int dy = p2.getY() - p1.getY();
             for (int y = 0; y <= dy; y++) {
                 world[p1.getX()][p1.getY() + y] = Tileset.FLOOR;
-                world[p1.getX() - 1][p1.getY() + y] = Tileset.WALL;
-                world[p1.getX() + 1][p1.getY() + y] = Tileset.WALL;
+                if (world[p1.getX() - 1][p1.getY() + y] != Tileset.FLOOR) {
+                    world[p1.getX() - 1][p1.getY() + y] = Tileset.WALL;
+                }
+
+                if (world[p1.getX() + 1][p1.getY() + y] != Tileset.FLOOR) {
+                    world[p1.getX() + 1][p1.getY() + y] = Tileset.WALL;
+                }
             }
         }
     }
@@ -109,7 +136,7 @@ public class World {
      *      .....
      *      #####
      */
-    public void drawHorizontalHallway(Position p1, Position p2) {
+    private void drawHorizontalHallway(Position p1, Position p2) {
         if (p1.getY() != p2.getY()) {
             throw new IllegalArgumentException("Position " + p1
                     + " and Position " + p2 + " should have same Y-positions!");
@@ -119,15 +146,25 @@ public class World {
             int dx = p1.getX() - p2.getX();
             for (int x = 0; x <= dx; x++) {
                 world[p2.getX() + x][p1.getY()] = Tileset.FLOOR;
-                world[p2.getX() + x][p1.getY() - 1] = Tileset.WALL;
-                world[p2.getX() + x][p1.getY() + 1] = Tileset.WALL;
+                if (world[p2.getX() + x][p1.getY() - 1] != Tileset.FLOOR) {
+                    world[p2.getX() + x][p1.getY() - 1] = Tileset.WALL;
+                }
+
+                if (world[p2.getX() + x][p1.getY() + 1] != Tileset.FLOOR) {
+                    world[p2.getX() + x][p1.getY() + 1] = Tileset.WALL;
+                }
             }
         } else {
             int dx = p2.getX() - p1.getX();
             for (int x = 0; x <= dx; x++) {
                 world[p1.getX() + x][p1.getY()] = Tileset.FLOOR;
-                world[p1.getX() + x][p1.getY() - 1] = Tileset.WALL;
-                world[p1.getX() + x][p1.getY() + 1] = Tileset.WALL;
+                if (world[p1.getX() + x][p1.getY() - 1] != Tileset.FLOOR) {
+                    world[p1.getX() + x][p1.getY() - 1] = Tileset.WALL;
+                }
+
+                if (world[p1.getX() + x][p1.getY() + 1] != Tileset.FLOOR) {
+                    world[p1.getX() + x][p1.getY() + 1] = Tileset.WALL;
+                }
             }
         }
     }
@@ -233,7 +270,7 @@ public class World {
         }
 
         if (r2X < r1X && r2Y < r1Y) {
-            if (r2X + r2.getHeight() - 1 >= r1X && r2Y + r2.getHeight() - 1 >= r1Y) {
+            if (r2X + r2.getWidth() - 1 >= r1X && r2Y + r2.getHeight() - 1 >= r1Y) {
                 return true;
             }
         }
