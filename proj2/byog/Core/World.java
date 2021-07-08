@@ -13,9 +13,9 @@ public class World {
     private final Random random;
     private ArrayList<Room> existingRooms = new ArrayList<>();
     private final int minRoomSize = 4;
-    private final int maxRoomSize = 15;
-    private final int minRoomNumbers = 10;
-    private final int maxRoomNumbers = 20;
+    private final int maxRoomSize = 13;
+    private final int minRoomNumbers = 15;
+    private final int maxRoomNumbers = 24;
 
     public World(int w, int h, long s) {
         width = w;
@@ -23,6 +23,99 @@ public class World {
         seed = s;
         random = new Random(seed);
         world = new TETile[width][height];
+    }
+
+    /** Randomly add a locked door to the world. */
+    public void addDoor() {
+        // Pick a room.
+        int randomRoomNumber = RandomUtils.uniform(random, 0, existingRooms.size());
+        Room randomRoom = existingRooms.get(randomRoomNumber);
+
+        // Pick a side of wall, and then choose a WALL which can be a valid door on that side.
+        // Side = 0: up, 1: down, 2: left, 3: right
+        int side = RandomUtils.uniform(random, 0, 4);
+        Position wallPosition = getOneValidWall(randomRoom, side);
+        world[wallPosition.getX()][wallPosition.getY()] = Tileset.LOCKED_DOOR;
+    }
+
+    /**
+     * Returns the position of a WALL which can be a valid door on the specific side.
+     * Side = 0: up, 1: down, 2: left, 3: right
+     */
+    private Position getOneValidWall(Room randomRoom, int side) {
+        Position wall = randomWall(randomRoom, side);
+        if (isValidDoor(wall, side)) {
+            return wall;
+        }
+        return getOneValidWall(randomRoom, side);
+    }
+
+    /**
+     * Returns true if a WALL on the side can be a door, false otherwise.
+     * Side = 0: up, 1: down, 2: left, 3: right
+     */
+    private boolean isValidDoor(Position wall, int side) {
+        int wallX = wall.getX();
+        int wallY = wall.getY();
+        switch (side) {
+            case 0:
+                if (world[wallX][wallY - 1] == Tileset.FLOOR) {
+                    if (world[wallX][wallY + 1] == Tileset.NOTHING || wallY == height - 1) {
+                        return true;
+                    }
+                }
+                return false;
+            case 1:
+                if (world[wallX][wallY + 1] == Tileset.FLOOR) {
+                    if (world[wallX][wallY - 1] == Tileset.NOTHING || wallY == 0) {
+                        return true;
+                    }
+                }
+                return false;
+            case 2:
+                if (world[wallX + 1][wallY] == Tileset.FLOOR) {
+                    if (world[wallX - 1][wallY] == Tileset.NOTHING || wallX == 0) {
+                        return true;
+                    }
+                }
+                return false;
+            case 3:
+                if (world[wallX - 1][wallY] == Tileset.FLOOR) {
+                    if (world[wallX + 1][wallY] == Tileset.NOTHING || wallX == width - 1) {
+                        return true;
+                    }
+                }
+                return false;
+            default: return false;
+        }
+    }
+
+    /**
+     * Returns the position of a randomly chosen wall on the specific side.
+     * Side = 0: up, 1: down, 2: left, 3: right
+     */
+    private Position randomWall(Room randomRoom, int side) {
+        int roomX = randomRoom.getPosition().getX();
+        int roomY = randomRoom.getPosition().getY();
+        switch (side) {
+            case 0:
+                int x0 = RandomUtils.uniform(random, roomX + 1,
+                        roomX + randomRoom.getWidth() - 1);
+                return new Position(x0, roomY + randomRoom.getHeight() - 1);
+            case 1:
+                int x1 = RandomUtils.uniform(random, roomX + 1,
+                        roomX + randomRoom.getWidth() - 1);
+                return new Position(x1, roomY);
+            case 2:
+                int y2 = RandomUtils.uniform(random, roomY + 1,
+                        roomY + randomRoom.getHeight() - 1);
+                return new Position(roomX, y2);
+            case 3:
+                int y3 = RandomUtils.uniform(random, roomY + 1,
+                        roomY + randomRoom.getHeight() - 1);
+                return new Position(roomX + randomRoom.getWidth() - 1, y3);
+            default: return null;
+        }
     }
 
     /** Adds hallways to all of the nearby rooms in the existing room list. */
