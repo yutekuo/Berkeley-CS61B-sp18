@@ -25,7 +25,7 @@ public class World {
         world = new TETile[width][height];
     }
 
-    /** Randomly add a locked door to the world. */
+    /** Randomly adds a locked door to the world. */
     public void addDoor() {
         // Pick a room.
         int randomRoomNumber = RandomUtils.uniform(random, 0, existingRooms.size());
@@ -33,8 +33,7 @@ public class World {
 
         // Pick a side of wall, and then choose a WALL which can be a valid door on that side.
         // Side = 0: up, 1: down, 2: left, 3: right
-        int side = RandomUtils.uniform(random, 0, 4);
-        Position wallPosition = getOneValidWall(randomRoom, side);
+        Position wallPosition = getOneValidWall(randomRoom);
         world[wallPosition.getX()][wallPosition.getY()] = Tileset.LOCKED_DOOR;
     }
 
@@ -42,12 +41,13 @@ public class World {
      * Returns the position of a WALL which can be a valid door on the specific side.
      * Side = 0: up, 1: down, 2: left, 3: right
      */
-    private Position getOneValidWall(Room randomRoom, int side) {
+    private Position getOneValidWall(Room randomRoom) {
+        int side = RandomUtils.uniform(random, 0, 4);
         Position wall = randomWall(randomRoom, side);
         if (isValidDoor(wall, side)) {
             return wall;
         }
-        return getOneValidWall(randomRoom, side);
+        return getOneValidWall(randomRoom);
     }
 
     /**
@@ -60,28 +60,28 @@ public class World {
         switch (side) {
             case 0:
                 if (world[wallX][wallY - 1] == Tileset.FLOOR) {
-                    if (world[wallX][wallY + 1] == Tileset.NOTHING || wallY == height - 1) {
+                    if (wallY == height - 1 || world[wallX][wallY + 1] == Tileset.NOTHING) {
                         return true;
                     }
                 }
                 return false;
             case 1:
                 if (world[wallX][wallY + 1] == Tileset.FLOOR) {
-                    if (world[wallX][wallY - 1] == Tileset.NOTHING || wallY == 0) {
+                    if (wallY == 0 || world[wallX][wallY - 1] == Tileset.NOTHING) {
                         return true;
                     }
                 }
                 return false;
             case 2:
                 if (world[wallX + 1][wallY] == Tileset.FLOOR) {
-                    if (world[wallX - 1][wallY] == Tileset.NOTHING || wallX == 0) {
+                    if (wallX == 0 || world[wallX - 1][wallY] == Tileset.NOTHING) {
                         return true;
                     }
                 }
                 return false;
             case 3:
                 if (world[wallX - 1][wallY] == Tileset.FLOOR) {
-                    if (world[wallX + 1][wallY] == Tileset.NOTHING || wallX == width - 1) {
+                    if (wallX == width - 1 || world[wallX + 1][wallY] == Tileset.NOTHING) {
                         return true;
                     }
                 }
