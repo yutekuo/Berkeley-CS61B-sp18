@@ -31,14 +31,14 @@ public class World {
         int randomRoomNumber = RandomUtils.uniform(random, 0, existingRooms.size());
         Room randomRoom = existingRooms.get(randomRoomNumber);
 
-        // Pick a side of wall, and then choose a WALL which can be a valid door on that side.
+        // Pick a side of wall, and then choose a WALL which can be a valid door on a side.
         // Side = 0: up, 1: down, 2: left, 3: right
         Position wallPosition = getOneValidWall(randomRoom);
         world[wallPosition.getX()][wallPosition.getY()] = Tileset.LOCKED_DOOR;
     }
 
     /**
-     * Returns the position of a WALL which can be a valid door on the specific side.
+     * Returns the position of a WALL which can be a valid door on a specific side.
      * Side = 0: up, 1: down, 2: left, 3: right
      */
     private Position getOneValidWall(Room randomRoom) {

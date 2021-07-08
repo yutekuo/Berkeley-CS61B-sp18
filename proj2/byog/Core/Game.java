@@ -9,7 +9,8 @@ public class Game {
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
 
-/*    public Game() {
+    /* Uncomment to see the StdDraw window.
+    public Game() {
         ter.initialize(WIDTH, HEIGHT);
     }*/
 
@@ -42,6 +43,7 @@ public class Game {
         worldMap.addDoor();
 
         // Draw the world on the screen.
+        //Uncomment to see the StdDraw window.
         //ter.renderFrame(worldMap.getWorld());
         return worldMap.getWorld();
     }
