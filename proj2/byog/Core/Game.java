@@ -9,12 +9,6 @@ public class Game {
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
 
-    // Uncomment to see the StdDraw window.
-    /*
-    public Game() {
-        ter.initialize(WIDTH, HEIGHT);
-    }*/
-
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
      */
@@ -34,6 +28,9 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
+        //Uncomment to see the StdDraw window.
+        //ter.initialize(WIDTH, HEIGHT);
+
         String seedString = input.substring(1, input.length() - 1);
         final long seed = Long.parseLong(seedString, 10);
 
