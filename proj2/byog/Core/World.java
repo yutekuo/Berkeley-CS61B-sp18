@@ -16,6 +16,8 @@ public class World {
     private final int maxRoomSize = 13;
     private final int minRoomNumbers = 15;
     private final int maxRoomNumbers = 24;
+    private int doorInWhichRoom;
+    private Position playerPosition;
 
     public World(int w, int h, long s) {
         width = w;
@@ -25,10 +27,51 @@ public class World {
         world = new TETile[width][height];
     }
 
+    /** Randomly adds a player to the world. */
+    public void addPlayer() {
+        int playerRoomNumber = getPlayerRoomNumber();
+        playerPosition = getPlayerPosition(playerRoomNumber);
+        world[playerPosition.getX()][playerPosition.getY()] = Tileset.PLAYER;
+    }
+
+    /**
+     * Returns the position of a FLOOR in the room with index playerRoomNumber
+     * in the existing room list.
+     */
+    private Position getPlayerPosition(int playerRoomNumber) {
+        Room room = existingRooms.get(playerRoomNumber);
+        int roomX = room.getPosition().getX();
+        int roomY = room.getPosition().getY();
+        int x = RandomUtils.uniform(random, roomX + 1, roomX + room.getWidth() - 1);
+        int y = RandomUtils.uniform(random, roomY + 1, roomY + room.getHeight() - 1);
+        if (world[x][y] == Tileset.FLOOR) {
+            return new Position(x, y);
+        }
+        return getPlayerPosition(playerRoomNumber);
+    }
+
+    /** Randomly returns a room index in the existing room list that a player can be inside. */
+    private int getPlayerRoomNumber() {
+        int playerRoomNumber = 0;
+        int middleRoomNumber = existingRooms.size() / 2;
+        if (doorInWhichRoom == middleRoomNumber) {
+            // Choose a room from either the leftmost room or the rightmost room.
+            playerRoomNumber = RandomUtils.uniform(random, 0, 2);
+        } else if (doorInWhichRoom < middleRoomNumber) {
+            // Choose a room from the right-half rooms in the world.
+            playerRoomNumber = RandomUtils.uniform(random, middleRoomNumber, existingRooms.size());
+        } else {
+            // Choose a room from the left-half rooms in the world.
+            playerRoomNumber = RandomUtils.uniform(random, 0, middleRoomNumber);
+        }
+        return playerRoomNumber;
+    }
+
     /** Randomly adds a locked door to the world. */
     public void addDoor() {
         // Pick a room.
         int randomRoomNumber = RandomUtils.uniform(random, 0, existingRooms.size());
+        doorInWhichRoom = randomRoomNumber;
         Room randomRoom = existingRooms.get(randomRoomNumber);
 
         // Pick a side of wall, and then choose a WALL which can be a valid door on a side.
