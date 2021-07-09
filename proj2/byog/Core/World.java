@@ -17,6 +17,7 @@ public class World {
     private final int minRoomNumbers = 15;
     private final int maxRoomNumbers = 24;
     private int doorInWhichRoom;
+    private Position doorPosition;
     private Position playerPosition;
 
     public World(int w, int h, long s) {
@@ -25,6 +26,47 @@ public class World {
         seed = s;
         random = new Random(seed);
         world = new TETile[width][height];
+    }
+
+    /**
+     * Move player's position according to the input.
+     * If input is 'w' or 'W': move up
+     *             'a' or 'A': move left
+     *             's' or 'S': move down
+     *             'd' or 'D': move right.
+     */
+    public void move(char input) {
+        int x = playerPosition.getX();
+        int y = playerPosition.getY();
+        if (input == 'w' || input == 'W') {
+            if (world[x][y + 1] != Tileset.FLOOR) {
+                return;
+            }
+            playerPosition = new Position(x, y + 1);
+            world[x][y] = Tileset.FLOOR;
+            world[x][y + 1] = Tileset.PLAYER;
+        } else if (input == 'a' || input == 'A') {
+            if (world[x - 1][y] != Tileset.FLOOR) {
+                return;
+            }
+            playerPosition = new Position(x - 1, y);
+            world[x][y] = Tileset.FLOOR;
+            world[x - 1][y] = Tileset.PLAYER;
+        } else if (input == 's' || input == 'S') {
+            if (world[x][y - 1] != Tileset.FLOOR) {
+                return;
+            }
+            playerPosition = new Position(x, y - 1);
+            world[x][y] = Tileset.FLOOR;
+            world[x][y - 1] = Tileset.PLAYER;
+        } else if (input == 'd' || input == 'D'){
+            if (world[x + 1][y] != Tileset.FLOOR) {
+                return;
+            }
+            playerPosition = new Position(x + 1, y);
+            world[x][y] = Tileset.FLOOR;
+            world[x + 1][y] = Tileset.PLAYER;
+        }
     }
 
     /** Randomly adds a player to the world. */
@@ -56,7 +98,12 @@ public class World {
         int middleRoomNumber = existingRooms.size() / 2;
         if (doorInWhichRoom == middleRoomNumber) {
             // Choose a room from either the leftmost room or the rightmost room.
-            playerRoomNumber = RandomUtils.uniform(random, 0, 2);
+            int leftOrRight = RandomUtils.uniform(random, 0, 2);
+            if (leftOrRight == 0) {
+                playerRoomNumber = 0;
+            } else {
+                playerRoomNumber = existingRooms.size() - 1;
+            }
         } else if (doorInWhichRoom < middleRoomNumber) {
             // Choose a room from the right-half rooms in the world.
             playerRoomNumber = RandomUtils.uniform(random, middleRoomNumber, existingRooms.size());
@@ -78,6 +125,7 @@ public class World {
         // Side = 0: up, 1: down, 2: left, 3: right
         Position wallPosition = getOneValidWall(randomRoom);
         world[wallPosition.getX()][wallPosition.getY()] = Tileset.LOCKED_DOOR;
+        doorPosition = new Position(wallPosition.getX(), wallPosition.getY());
     }
 
     /**

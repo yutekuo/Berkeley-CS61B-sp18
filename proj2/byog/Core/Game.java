@@ -8,6 +8,8 @@ public class Game {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
+    private long seed;
+    private World worldMap;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
@@ -24,22 +26,39 @@ public class Game {
      * world. However, the behavior is slightly different. After playing with "n123sss:q", the game
      * should save, and thus if we then called playWithInputString with the string "l", we'd expect
      * to get the exact same world back again, since this corresponds to loading the saved game.
-     * @param input the input string to feed to your program
+     * @param s the input string to feed to your program
      * @return the 2D TETile[][] representing the state of the world
      */
-    public TETile[][] playWithInputString(String input) {
+    public TETile[][] playWithInputString(String s) {
         //Uncomment to see the StdDraw window.
         //ter.initialize(WIDTH, HEIGHT);
 
-        String seedString = input.substring(1, input.length() - 1);
-        final long seed = Long.parseLong(seedString, 10);
+        char[] input = s.toCharArray();
+        StringBuilder seedString = new StringBuilder();
+        int index = 1;
 
-        World worldMap = new World(WIDTH, HEIGHT, seed);
-        worldMap.fillWithNothing();
-        worldMap.addManyRooms();
-        worldMap.addHallways();
-        worldMap.addDoor();
-        worldMap.addPlayer();
+        if (input[0] == 'n' || input[0] == 'N') {
+            // Start a new game.
+            while (input[index] != 's' && input[index] != 'S') {
+                seedString.append(input[index]);
+                index++;
+            }
+            seed = Long.parseLong(seedString.toString());
+            worldMap = new World(WIDTH, HEIGHT, seed);
+            worldMap.fillWithNothing();
+            worldMap.addManyRooms();
+            worldMap.addHallways();
+            worldMap.addDoor();
+            worldMap.addPlayer();
+        } else if (input[0] == 'l' || input[0] == 'L') {
+            index = 0;
+        }
+
+        index++;
+        while (index < input.length && input[index] != ':') {
+            worldMap.move(input[index]);
+            index++;
+        }
 
         // Draw the world on the screen.
         //Uncomment to see the StdDraw window.
