@@ -59,7 +59,7 @@ public class World {
             playerPosition = new Position(x, y - 1);
             world[x][y] = Tileset.FLOOR;
             world[x][y - 1] = Tileset.PLAYER;
-        } else if (input == 'd' || input == 'D'){
+        } else if (input == 'd' || input == 'D') {
             if (world[x + 1][y] != Tileset.FLOOR) {
                 return;
             }
