@@ -151,28 +151,36 @@ public class World {
         switch (side) {
             case 0:
                 if (world[wallX][wallY - 1] == Tileset.FLOOR) {
-                    if (wallY == height - 1 || world[wallX][wallY + 1] == Tileset.NOTHING) {
+                    if (wallY == height - 1) {
+                        return true;
+                    } else if (world[wallX][wallY + 1] == Tileset.NOTHING) {
                         return true;
                     }
                 }
                 return false;
             case 1:
                 if (world[wallX][wallY + 1] == Tileset.FLOOR) {
-                    if (wallY == 0 || world[wallX][wallY - 1] == Tileset.NOTHING) {
+                    if (wallY == 0) {
+                        return true;
+                    } else if (world[wallX][wallY - 1] == Tileset.NOTHING) {
                         return true;
                     }
                 }
                 return false;
             case 2:
                 if (world[wallX + 1][wallY] == Tileset.FLOOR) {
-                    if (wallX == 0 || world[wallX - 1][wallY] == Tileset.NOTHING) {
+                    if (wallX == 0) {
+                        return true;
+                    } else if (world[wallX - 1][wallY] == Tileset.NOTHING) {
                         return true;
                     }
                 }
                 return false;
             case 3:
                 if (world[wallX - 1][wallY] == Tileset.FLOOR) {
-                    if (wallX == width - 1 || world[wallX + 1][wallY] == Tileset.NOTHING) {
+                    if (wallX == width - 1) {
+                        return true;
+                    } else if (world[wallX + 1][wallY] == Tileset.NOTHING) {
                         return true;
                     }
                 }

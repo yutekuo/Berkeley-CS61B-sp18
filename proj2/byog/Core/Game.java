@@ -48,7 +48,7 @@ public class Game {
             worldMap.fillWithNothing();
             worldMap.addManyRooms();
             worldMap.addHallways();
-            //worldMap.addDoor();
+            worldMap.addDoor();
             worldMap.addPlayer();
         } else if (input[0] == 'l' || input[0] == 'L') {
             index = 0;
