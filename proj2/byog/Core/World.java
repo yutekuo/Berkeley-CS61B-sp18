@@ -133,7 +133,7 @@ public class World {
      * Side = 0: up, 1: down, 2: left, 3: right
      */
     private Position getOneValidWall(Room randomRoom) {
-        int side = RandomUtils.uniform(random, 0, 4);
+        int side = RandomUtils.uniform(random, 4);
         Position wall = randomWall(randomRoom, side);
         if (isValidDoor(wall, side)) {
             return wall;
