@@ -29,7 +29,7 @@ public class Game {
      */
     public TETile[][] playWithInputString(String input) {
         // Uncomment to see the StdDraw window.
-         ter.initialize(WIDTH, HEIGHT);
+        //ter.initialize(WIDTH, HEIGHT);
         String seedString = input.substring(1, input.length() - 1);
         final long seed = Long.parseLong(seedString, 10);
 
@@ -40,7 +40,7 @@ public class Game {
 
         // Draw the world on the screen.
         //Uncomment to see the StdDraw window.
-        ter.renderFrame(worldMap.getWorld());
+        //ter.renderFrame(worldMap.getWorld());
         return worldMap.getWorld();
     }
 }
