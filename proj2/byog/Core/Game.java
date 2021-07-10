@@ -35,38 +35,38 @@ public class Game {
         // Start a new game or load a previous game.
         // Start a new game: assign a new World object to worldMap.
         // Load a previous game: keep using the existing worldMap.
-        input = input.toUpperCase();
+        String upperCaseInput = input.toUpperCase();
         int index;
-        if (input.charAt(0) == 'N') {
+        if (upperCaseInput.charAt(0) == 'N') {
             StringBuilder seedString = new StringBuilder();
             index = 1;
-            while (input.charAt(index) != 'S') {
-                seedString.append(input.charAt(index));
+            while (upperCaseInput.charAt(index) != 'S') {
+                seedString.append(upperCaseInput.charAt(index));
                 index++;
             }
             long seed = Long.parseLong(seedString.toString());
             worldMap = createOneWorld(seed);
-            // Now input.charAt[index] == 'S' of the substring "N####S"
+            // Now upperCaseInput.charAt[index] == 'S' of the substring "N####S"
         } else {
-            index = 0; // input.charAt[0] == 'L''.
+            index = 0; // upperCaseInput.charAt[0] == 'L''.
         }
 
         // Process saving and movement.
-        if (index != input.length() - 1) {
-            if (input.contains(":Q")) {
-                int endIndex = input.indexOf(":Q");
+        if (index != upperCaseInput.length() - 1) {
+            if (upperCaseInput.contains(":Q")) {
+                int endIndex = upperCaseInput.indexOf(":Q");
                 index++;
                 while (index < endIndex) {
-                    worldMap.move(input.charAt(index));
+                    worldMap.move(upperCaseInput.charAt(index));
                     index++;
                 }
             } else {
                 index++;
-                while (index < input.length()) {
+                while (index < upperCaseInput.length()) {
                     if (worldMap == null) {
                         throw new NullPointerException("worldMap points to null!");
                     }
-                    worldMap.move(input.charAt(index));
+                    worldMap.move(upperCaseInput.charAt(index));
                     index++;
                 }
             }
