@@ -76,7 +76,7 @@ public class Game {
                 saveInput(savedInput.toString());
                 return playWithInputString(newInput.toString());
             }
-        } else {
+        } else { // !upperCaseInput.contains(":Q")
             if (upperCaseInput.charAt(0) == 'N') {
                 StringBuilder seedString = new StringBuilder();
                 int index = 1;
