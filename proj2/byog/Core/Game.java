@@ -31,7 +31,7 @@ public class Game {
      */
     public TETile[][] playWithInputString(String s) {
         //Uncomment to see the StdDraw window.
-        ter.initialize(WIDTH, HEIGHT);
+        //ter.initialize(WIDTH, HEIGHT);
 
         char[] input = s.toCharArray();
         StringBuilder seedString = new StringBuilder();
@@ -48,7 +48,7 @@ public class Game {
             worldMap.fillWithNothing();
             worldMap.addManyRooms();
             worldMap.addHallways();
-            worldMap.addDoor();
+            //worldMap.addDoor();
             worldMap.addPlayer();
         } else if (input[0] == 'l' || input[0] == 'L') {
             index = 0;
@@ -56,13 +56,13 @@ public class Game {
 
         index++;
         while (index < input.length && input[index] != ':') {
-            worldMap.move(input[index]);
+            //worldMap.move(input[index]);
             index++;
         }
 
         // Draw the world on the screen.
         //Uncomment to see the StdDraw window.
-        ter.renderFrame(worldMap.getWorld());
+        //ter.renderFrame(worldMap.getWorld());
         return worldMap.getWorld();
     }
 }
