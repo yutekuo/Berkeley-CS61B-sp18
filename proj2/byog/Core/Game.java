@@ -31,7 +31,7 @@ public class Game {
      */
     public TETile[][] playWithInputString(String s) {
         //Uncomment to see the StdDraw window.
-        //ter.initialize(WIDTH, HEIGHT);
+        ter.initialize(WIDTH, HEIGHT);
 
         char[] input = s.toCharArray();
         StringBuilder seedString = new StringBuilder();
@@ -62,7 +62,7 @@ public class Game {
 
         // Draw the world on the screen.
         //Uncomment to see the StdDraw window.
-        //ter.renderFrame(worldMap.getWorld());
+        ter.renderFrame(worldMap.getWorld());
         return worldMap.getWorld();
     }
 }

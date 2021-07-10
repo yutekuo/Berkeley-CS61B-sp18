@@ -94,7 +94,7 @@ public class World {
 
     /** Randomly returns a room index in the existing room list that a player can be inside. */
     private int getPlayerRoomNumber() {
-        int playerRoomNumber = 0;
+        int playerRoomNumber;
         int middleRoomNumber = existingRooms.size() / 2;
         if (doorInWhichRoom == middleRoomNumber) {
             // Choose a room from either the leftmost room or the rightmost room.
