@@ -8,6 +8,7 @@ public class Game {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
+    private World worldMap;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
@@ -29,18 +30,57 @@ public class Game {
      */
     public TETile[][] playWithInputString(String input) {
         // Uncomment to see the StdDraw window.
-        //ter.initialize(WIDTH, HEIGHT);
-        String seedString = input.substring(1, input.length() - 1);
-        final long seed = Long.parseLong(seedString, 10);
+        ter.initialize(WIDTH, HEIGHT);
 
-        World worldMap = new World(WIDTH, HEIGHT, seed);
-        worldMap.fillWithNothing();
-        worldMap.addManyRooms();
-        worldMap.addHallways();
+        // Start a new game or load a previous game.
+        // Start a new game: assign a new World object to worldMap.
+        // Load a previous game: keep using the existing worldMap.
+        input = input.toUpperCase();
+        int index;
+        if (input.charAt(0) == 'N') {
+            StringBuilder seedString = new StringBuilder();
+            index = 1;
+            while (input.charAt(index) != 'S') {
+                seedString.append(input.charAt(index));
+                index++;
+            }
+            long seed = Long.parseLong(seedString.toString());
+            worldMap = createOneWorld(seed);
+            // Now input.charAt[index] == 'S' of the substring "N####S"
+        } else {
+            index = 0; // input.charAt[0] == 'L''.
+        }
+
+        // Process saving and movement.
+        if (index != input.length() - 1) {
+            if (input.contains(":Q")) {
+                int endIndex = input.indexOf(":Q");
+                index++;
+                while (index < endIndex) {
+                    worldMap.move(input.charAt(index));
+                    index++;
+                }
+            } else {
+                index++;
+                while (index < input.length()) {
+                    worldMap.move(input.charAt(index));
+                    index++;
+                }
+            }
+        }
 
         // Draw the world on the screen.
         //Uncomment to see the StdDraw window.
-        //ter.renderFrame(worldMap.getWorld());
+        ter.renderFrame(worldMap.getWorld());
         return worldMap.getWorld();
+    }
+
+    private World createOneWorld(long seed) {
+        World world = new World(WIDTH, HEIGHT, seed);
+        world.fillWithNothing();
+        world.addManyRooms();
+        world.addHallways();
+        world.addPlayer();
+        return world;
     }
 }

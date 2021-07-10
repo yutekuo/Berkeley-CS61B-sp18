@@ -16,6 +16,7 @@ public class World {
     private final int maxRoomSize = 13;
     private final int minRoomNumbers = 15;
     private final int maxRoomNumbers = 24;
+    private Position playerPosition;
 
     public World(int w, int h, long s) {
         width = w;
@@ -23,6 +24,70 @@ public class World {
         seed = s;
         random = new Random(seed);
         world = new TETile[width][height];
+    }
+
+    /**
+     * Move player's position according to the input.
+     * If input is 'W': move up
+     *             'A': move left
+     *             'S': move down
+     *             'D': move right.
+     */
+    public void move(char input) {
+        int x = playerPosition.getX();
+        int y = playerPosition.getY();
+        if (input == 'W') {
+            if (world[x][y + 1] != Tileset.FLOOR) {
+                return;
+            }
+            playerPosition = new Position(x, y + 1);
+            world[x][y] = Tileset.FLOOR;
+            world[x][y + 1] = Tileset.PLAYER;
+        } else if (input == 'A') {
+            if (world[x - 1][y] != Tileset.FLOOR) {
+                return;
+            }
+            playerPosition = new Position(x - 1, y);
+            world[x][y] = Tileset.FLOOR;
+            world[x - 1][y] = Tileset.PLAYER;
+        } else if (input == 'S') {
+            if (world[x][y - 1] != Tileset.FLOOR) {
+                return;
+            }
+            playerPosition = new Position(x, y - 1);
+            world[x][y] = Tileset.FLOOR;
+            world[x][y - 1] = Tileset.PLAYER;
+        } else if (input == 'D') {
+            if (world[x + 1][y] != Tileset.FLOOR) {
+                return;
+            }
+            playerPosition = new Position(x + 1, y);
+            world[x][y] = Tileset.FLOOR;
+            world[x + 1][y] = Tileset.PLAYER;
+        }
+    }
+
+    /** Randomly adds a player to the world. */
+    public void addPlayer() {
+        int playerRoomNumber = RandomUtils.uniform(random, 0, existingRooms.size());
+        playerPosition = getPlayerPosition(playerRoomNumber);
+        world[playerPosition.getX()][playerPosition.getY()] = Tileset.PLAYER;
+    }
+
+    /**
+     * Returns the position of a FLOOR in the room with index playerRoomNumber
+     * in the existing room list.
+     */
+    private Position getPlayerPosition(int playerRoomNumber) {
+        Room room = existingRooms.get(playerRoomNumber);
+        int roomX = room.getPosition().getX();
+        int roomY = room.getPosition().getY();
+        int x = RandomUtils.uniform(random, roomX + 1, roomX + room.getWidth() - 1);
+        int y = RandomUtils.uniform(random, roomY + 1, roomY + room.getHeight() - 1);
+        if (world[x][y] == Tileset.FLOOR) {
+            return new Position(x, y);
+        }
+        return getPlayerPosition(playerRoomNumber);
     }
 
     /** Adds hallways to all of the nearby rooms in the existing room list. */
