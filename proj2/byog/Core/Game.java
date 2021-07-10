@@ -2,6 +2,13 @@ package byog.Core;
 
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class Game {
     TERenderer ter = new TERenderer();
@@ -32,43 +39,67 @@ public class Game {
         // Uncomment to see the StdDraw window.
         //ter.initialize(WIDTH, HEIGHT);
 
-        // Start a new game or load a previous game.
-        // Start a new game: assign a new World object to worldMap.
-        // Load a previous game: keep using the existing worldMap.
         String upperCaseInput = input.toUpperCase();
-        int index;
-        if (upperCaseInput.charAt(0) == 'N') {
-            StringBuilder seedString = new StringBuilder();
-            index = 1;
-            while (upperCaseInput.charAt(index) != 'S') {
-                seedString.append(upperCaseInput.charAt(index));
-                index++;
-            }
-            long seed = Long.parseLong(seedString.toString());
-            worldMap = createOneWorld(seed);
-            // Now upperCaseInput.charAt[index] == 'S' of the substring "N####S"
-        } else {
-            index = 0; // upperCaseInput.charAt[0] == 'L''.
-        }
 
-        // Process saving and movement.
-        if (index != upperCaseInput.length() - 1) {
-            if (upperCaseInput.contains(":Q")) {
-                int endIndex = upperCaseInput.indexOf(":Q");
+        if (upperCaseInput.contains(":Q")) {
+            StringBuilder savedInput = new StringBuilder();
+            int endIndex = upperCaseInput.indexOf(":Q");
+
+            if (upperCaseInput.charAt(0) == 'N') {
+                savedInput.append('N');
+                StringBuilder seedString = new StringBuilder();
+                int index = 1;
+                while (upperCaseInput.charAt(index) != 'S') {
+                    seedString.append(upperCaseInput.charAt(index));
+                    savedInput.append(upperCaseInput.charAt(index));
+                    index++;
+                }
+                // Now upperCaseInput.charAt[index] == 'S' of the substring "N####S".
+                savedInput.append(upperCaseInput.charAt(index));
+                long seed = Long.parseLong(seedString.toString());
+                worldMap = createOneWorld(seed);
+
                 index++;
                 while (index < endIndex) {
                     worldMap.move(upperCaseInput.charAt(index));
+                    savedInput.append(upperCaseInput.charAt(index));
                     index++;
                 }
-            } else {
+                saveInput(savedInput.toString());
+            } else { // upperCaseInput.charAt(0) == 'L'
+                String previousInput = loadInput();
+                StringBuilder newInput = new StringBuilder(previousInput);
+                if (endIndex != 1) {
+                    newInput.append(upperCaseInput, 1, endIndex);
+                    savedInput.append(upperCaseInput, 1, endIndex);
+                }
+                saveInput(savedInput.toString());
+                return playWithInputString(newInput.toString());
+            }
+        } else {
+            if (upperCaseInput.charAt(0) == 'N') {
+                StringBuilder seedString = new StringBuilder();
+                int index = 1;
+                while (upperCaseInput.charAt(index) != 'S') {
+                    seedString.append(upperCaseInput.charAt(index));
+                    index++;
+                }
+                // Now upperCaseInput.charAt[index] == 'S' of the substring "N####S".
+                long seed = Long.parseLong(seedString.toString());
+                worldMap = createOneWorld(seed);
+
                 index++;
                 while (index < upperCaseInput.length()) {
-                    if (worldMap == null) {
-                        throw new NullPointerException("worldMap points to null!");
-                    }
                     worldMap.move(upperCaseInput.charAt(index));
                     index++;
                 }
+            } else { // upperCaseInput.charAt(0) == 'L'
+                String previousInput = loadInput();
+                StringBuilder newInput = new StringBuilder(previousInput);
+                if (upperCaseInput.length() > 1) {
+                    newInput.append(upperCaseInput, 1, upperCaseInput.length());
+                }
+                return playWithInputString(newInput.toString());
             }
         }
 
@@ -85,5 +116,49 @@ public class Game {
         world.addHallways();
         world.addPlayer();
         return world;
+    }
+
+    /** Load the previous input from savedGame.txt to Game.java. */
+    private static String loadInput() {
+        File f = new File("./savedGame.txt");
+        if (f.exists()) {
+            try {
+                FileInputStream fs = new FileInputStream(f);
+                ObjectInputStream os = new ObjectInputStream(fs);
+                String loadInput = os.readObject().toString();
+                os.close();
+                return loadInput;
+            } catch (FileNotFoundException e) {
+                System.out.println("file not found");
+                System.exit(0);
+            } catch (IOException e) {
+                System.out.println(e);
+                System.exit(0);
+            } catch (ClassNotFoundException e) {
+                System.out.println("class not found");
+                System.exit(0);
+            }
+        }
+        return "";
+    }
+
+    /** Save input to the file savedGame.txt. */
+    private static void saveInput(String input) {
+        File f = new File("./savedGame.txt");
+        try {
+            if (!f.exists()) {
+                f.createNewFile();
+            }
+            FileOutputStream fs = new FileOutputStream(f);
+            ObjectOutputStream os = new ObjectOutputStream(fs);
+            os.writeObject(input);
+            os.close();
+        }  catch (FileNotFoundException e) {
+            System.out.println("file not found");
+            System.exit(0);
+        } catch (IOException e) {
+            System.out.println(e);
+            System.exit(0);
+        }
     }
 }
