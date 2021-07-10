@@ -30,7 +30,7 @@ public class Game {
      */
     public TETile[][] playWithInputString(String input) {
         // Uncomment to see the StdDraw window.
-        ter.initialize(WIDTH, HEIGHT);
+        //ter.initialize(WIDTH, HEIGHT);
 
         // Start a new game or load a previous game.
         // Start a new game: assign a new World object to worldMap.
@@ -71,7 +71,7 @@ public class Game {
 
         // Draw the world on the screen.
         //Uncomment to see the StdDraw window.
-        ter.renderFrame(worldMap.getWorld());
+        //ter.renderFrame(worldMap.getWorld());
         return worldMap.getWorld();
     }
 
