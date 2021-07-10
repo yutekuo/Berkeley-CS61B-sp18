@@ -8,7 +8,6 @@ import byog.TileEngine.TETile;
  */
 public class Main {
     public static void main(String[] args) {
-
         if (args.length > 1) {
             System.out.println("Can only have one argument - the input string");
             System.exit(0);
@@ -20,11 +19,5 @@ public class Main {
             Game game = new Game();
             game.playWithKeyboard();
         }
-        /*
-        Game game = new Game();
-        TETile[][] worldState = game.playWithInputString("N3S:Q");
-        game.playWithInputString("LDDDD:Q");
-        game.playWithInputString("LSSSS");
-        System.out.println(TETile.toString(worldState));*/
     }
 }
