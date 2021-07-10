@@ -34,6 +34,9 @@ public class World {
      *             'D': move right.
      */
     public void move(char input) {
+        if (input != 'W' || input != 'S' || input != 'A' || input != 'D') {
+            throw new IllegalArgumentException("Invalid move()'s input.");
+        }
         int x = playerPosition.getX();
         int y = playerPosition.getY();
         if (input == 'W') {

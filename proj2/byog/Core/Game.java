@@ -63,6 +63,9 @@ public class Game {
             } else {
                 index++;
                 while (index < input.length()) {
+                    if (worldMap == null) {
+                        throw new NullPointerException("worldMap points to null!");
+                    }
                     worldMap.move(input.charAt(index));
                     index++;
                 }
