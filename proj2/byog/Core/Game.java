@@ -21,6 +21,10 @@ public class Game {
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
+        ter.initialize(WIDTH, HEIGHT);
+
+        // Draw the world on the screen.
+        ter.renderFrame(worldMap.getWorld());
     }
 
     /**
@@ -36,9 +40,6 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
-        // Uncomment to see the StdDraw window.
-        //ter.initialize(WIDTH, HEIGHT);
-
         String upperCaseInput = input.toUpperCase();
 
         if (upperCaseInput.contains(":Q")) {
@@ -103,9 +104,6 @@ public class Game {
             }
         }
 
-        // Draw the world on the screen.
-        //Uncomment to see the StdDraw window.
-        //ter.renderFrame(worldMap.getWorld());
         return worldMap.getWorld();
     }
 
