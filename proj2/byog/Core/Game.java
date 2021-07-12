@@ -25,7 +25,6 @@ public class Game {
     private static final int MENU_WIDTH = 40;
     private static final int MENU_HEIGHT = 40;
     private World worldMap;
-    private boolean playerStatus = true;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
@@ -47,8 +46,7 @@ public class Game {
                 ter.initialize(WIDTH, HEIGHT + HEADS_UP_DISPLAY_SIZE);
                 worldMap = createOneWorld(seed);
                 ter.renderFrame(worldMap.getWorld());
-                drawHUD(seed);
-                savedInput.append(processMove(inputSource, seed));
+                savedInput.append(processMove(inputSource));
                 saveInput(savedInput.toString());
                 exit(0);
             } else if (firstKey == 'L') {
@@ -68,29 +66,17 @@ public class Game {
                     index++;
                 }
                 ter.renderFrame(worldMap.getWorld());
-                drawHUD(seed);
                 savedInput.append(previousInput);
 
-                savedInput.append(processMove(inputSource, seed));
+                savedInput.append(processMove(inputSource));
                 saveInput(savedInput.toString());
                 exit(0);
             }
         }
     }
 
-    /** Draws the heads up display. */
-    private void drawHUD(long seed) {
-        StdDraw.setFont(new Font("Monaco", Font.BOLD, 20));
-        StdDraw.setPenColor(Color.white);
-        StdDraw.textLeft(1, HEIGHT + HEADS_UP_DISPLAY_SIZE - 1, "World Seed: " + seed);
-        StdDraw.text(WIDTH / 2, HEIGHT + HEADS_UP_DISPLAY_SIZE - 1,
-                "Status: " + (playerStatus ? "playing" : "win"));
-        StdDraw.line(0, HEIGHT +HEADS_UP_DISPLAY_SIZE - 2, WIDTH, HEIGHT +HEADS_UP_DISPLAY_SIZE - 2);
-        StdDraw.show();
-    }
-
     /** Process movement and return input string. */
-    private String processMove(InputSource inputSource, long seed) {
+    private String processMove(InputSource inputSource) {
         StringBuilder input = new StringBuilder();
         while (inputSource.possibleNextInput()) {
             char key = Character.toUpperCase(inputSource.getNextKey());
@@ -100,7 +86,6 @@ public class Game {
                 input.append(key);
                 worldMap.move(key);
                 ter.renderFrame(worldMap.getWorld());
-                drawHUD(seed);
             }
         }
         return input.toString();
@@ -252,7 +237,6 @@ public class Game {
         world.addManyRooms();
         world.addHallways();
         world.addPlayer();
-        world.addDoor();
         return world;
     }
 
