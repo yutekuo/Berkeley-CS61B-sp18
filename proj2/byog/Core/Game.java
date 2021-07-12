@@ -21,20 +21,21 @@ public class Game {
     /* Feel free to change the width and height. */
     private static final int WIDTH = 80;
     private static final int HEIGHT = 30;
-    private static final int HEADS_UP_DISPLAY_SIZE = 3;
     private static final int MENU_WIDTH = 40;
     private static final int MENU_HEIGHT = 40;
     private World worldMap;
+    private boolean gameOver;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
+        gameOver = false;
         InputSource inputSource = new KeyboardInputSource();
         StringBuilder savedInput = new StringBuilder();
         drawMenu();
 
-        while (true) {
+        while (!gameOver) {
             char firstKey = Character.toUpperCase(inputSource.getNextKey());
             if (firstKey == 'N') {
                 savedInput.append(firstKey);
@@ -43,14 +44,15 @@ public class Game {
                 savedInput.append(seedString);
 
                 long seed = Long.parseLong(seedString.substring(0, seedString.length() - 1));
-                ter.initialize(WIDTH, HEIGHT + HEADS_UP_DISPLAY_SIZE);
+                ter.initialize(WIDTH, HEIGHT);
                 worldMap = createOneWorld(seed);
                 ter.renderFrame(worldMap.getWorld());
+
                 savedInput.append(processMove(inputSource));
                 saveInput(savedInput.toString());
                 exit(0);
             } else if (firstKey == 'L') {
-                ter.initialize(WIDTH, HEIGHT + HEADS_UP_DISPLAY_SIZE);
+                ter.initialize(WIDTH, HEIGHT);
                 String previousInput = loadInput();
                 StringBuilder seedString = new StringBuilder();
                 int index = 1;
@@ -86,6 +88,18 @@ public class Game {
                 input.append(key);
                 worldMap.move(key);
                 ter.renderFrame(worldMap.getWorld());
+                if (worldMap.isPlayerWinTheGame()) {
+                    gameOver = true;
+                    StdDraw.setFont(new Font("Monaco", Font.BOLD, 100));
+                    StdDraw.setPenColor(Color.WHITE);
+                    StdDraw.text(WIDTH / 2, HEIGHT / 2 + 5, "YOU WIN!");
+                    StdDraw.setFont(new Font("Monaco", Font.BOLD, 70));
+                    StdDraw.text(WIDTH / 2, HEIGHT / 2, "Back to Menu in 5 seconds...");
+                    StdDraw.show();
+                    StdDraw.pause(5000);
+                    playWithKeyboard();
+                    break;
+                }
             }
         }
         return input.toString();
@@ -127,7 +141,7 @@ public class Game {
     /** Draw the menu of the game. */
     private void drawMenu() {
         ter.initialize(MENU_WIDTH, MENU_HEIGHT);
-        String gameTitle = "CS61B: THE GAME";
+        String gameTitle = "FIND THE FLAGS";
         String newGame = "New Game (N)";
         String loadGame = "Load Game (L)";
         String quit = "Quit and Save Game (Q)";

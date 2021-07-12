@@ -18,8 +18,10 @@ public class World {
     private final int maxRoomNumbers = 24;
     private Position playerPosition;
     private int playerRoomNumber;
-    private int numberOfFlags = 3;
+    private final int numberOfFlags = 5;
     private ArrayList<Position> flagPosition = new ArrayList<>();
+    private int collectedFlags = 0;
+    private boolean isPlayerWin = false;
 
     public World(int w, int h, long s) {
         width = w;
@@ -29,6 +31,49 @@ public class World {
         world = new TETile[width][height];
     }
 
+    /** Returns true if the player wins the game. */
+    public boolean isPlayerWinTheGame() {
+        return isPlayerWin;
+    }
+
+    /** Check if player win the game. */
+    private void checkIfPlayerWin() {
+        for (int i = 0; i < numberOfFlags; i++) {
+            Position fp = flagPosition.get(i);
+            int fpX = fp.getX();
+            int fpY = fp.getY();
+            if (world[fpX][fpY] != Tileset.FLAG) {
+                collectedFlags++;
+            }
+        }
+        if (collectedFlags == numberOfFlags) {
+            isPlayerWin = true;
+        }
+        collectedFlags = 0;
+    }
+
+    /** Track if player collects the flags. */
+    private void trackPlayerAndFlags() {
+        for (int i = 0; i < numberOfFlags; i++) {
+            Position fp = flagPosition.get(i);
+            int fpX = fp.getX();
+            int fpY = fp.getY();
+            if (world[fpX + 1][fpY] == Tileset.PLAYER) {
+                world[fpX][fpY] = Tileset.FLOOR;
+            } else if (world[fpX][fpY + 1] == Tileset.PLAYER) {
+                world[fpX][fpY] = Tileset.FLOOR;
+            } else if (world[fpX - 1][fpY] == Tileset.PLAYER) {
+                world[fpX][fpY] = Tileset.FLOOR;
+            } else if (world[fpX][fpY - 1] == Tileset.PLAYER) {
+                world[fpX][fpY] = Tileset.FLOOR;
+            }
+        }
+    }
+
+    /**
+     * Adds some flags to the world.
+     * Flags and player must be in different room.
+     */
     public void addFlags() {
         int flags = 0;
         while (flags < numberOfFlags) {
@@ -40,9 +85,10 @@ public class World {
             int roomX = room.getPosition().getX();
             int roomY = room.getPosition().getY();
             int x = RandomUtils.uniform(random, roomX + 1, roomX + room.getWidth() - 1);
-            int y = RandomUtils.uniform(random, roomY + 1, roomY +room.getHeight() - 1);
+            int y = RandomUtils.uniform(random, roomY + 1, roomY + room.getHeight() - 1);
             if (world[x][y] == Tileset.FLOOR) {
                 world[x][y] = Tileset.FLAG;
+                flagPosition.add(new Position(x, y));
                 flags++;
             }
         }
@@ -87,6 +133,8 @@ public class World {
             world[x][y] = Tileset.FLOOR;
             world[x + 1][y] = Tileset.PLAYER;
         }
+        trackPlayerAndFlags();
+        checkIfPlayerWin();
     }
 
     /** Randomly adds a player to the world. */
