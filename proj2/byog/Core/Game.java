@@ -39,6 +39,7 @@ public class Game {
             char firstKey = Character.toUpperCase(inputSource.getNextKey());
             if (firstKey == 'N') {
                 savedInput.append(firstKey);
+                drawTips();
                 drawPrompt("");
                 String seedString = solicitSeedInput();
                 savedInput.append(seedString);
@@ -50,6 +51,7 @@ public class Game {
 
                 savedInput.append(processMove(inputSource));
                 saveInput(savedInput.toString());
+                StdDraw.pause(500);
                 exit(0);
             } else if (firstKey == 'L') {
                 ter.initialize(WIDTH, HEIGHT);
@@ -72,6 +74,7 @@ public class Game {
 
                 savedInput.append(processMove(inputSource));
                 saveInput(savedInput.toString());
+                StdDraw.pause(500);
                 exit(0);
             }
         }
@@ -121,6 +124,20 @@ public class Game {
         }
         StdDraw.pause(500);
         return input.toString();
+    }
+
+    /** Tell user the game instructions. */
+    private void drawTips() {
+        StdDraw.clear(Color.black);
+        StdDraw.setFont(new Font("Consolas", Font.BOLD, 40));
+        StdDraw.setPenColor(Color.CYAN);
+        StdDraw.text(MENU_WIDTH / 2, MENU_HEIGHT - 5, "Game Instructions:");
+        StdDraw.textLeft(10, MENU_HEIGHT - 10, "W: Move Up");
+        StdDraw.textLeft(10, MENU_HEIGHT - 15, "A: Move Left");
+        StdDraw.textLeft(10, MENU_HEIGHT - 20, "S: Move Down");
+        StdDraw.textLeft(10, MENU_HEIGHT - 25, "D: Move Right");
+        StdDraw.show();
+        StdDraw.pause(5000);
     }
 
     /** Prompt for user to type in a seed. */
