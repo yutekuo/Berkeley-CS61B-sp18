@@ -237,6 +237,7 @@ public class Game {
         world.addManyRooms();
         world.addHallways();
         world.addPlayer();
+        world.addFlags();
         return world;
     }
 
