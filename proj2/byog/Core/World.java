@@ -41,7 +41,7 @@ public class World {
         int topY = bottomY + room.getHeight() - 1;
         int x = RandomUtils.uniform(random, leftX + 1, rightX);
         int y = RandomUtils.uniform(random, bottomY + 1, topY);
-        int side = random.nextInt() % 4;
+        int side = random.nextInt(4);
         switch (side) {
             case 0: // up
                 if (topY == height - 1 && world[x][topY - 1] == Tileset.FLOOR) {
