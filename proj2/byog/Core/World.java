@@ -28,98 +28,75 @@ public class World {
         world = new TETile[width][height];
     }
 
-    /** Randomly adds a locked door to the world. */
     public void addDoor() {
-        // Pick a room.
-        int randomRoomNumber = RandomUtils.uniform(random, 0, existingRooms.size());
-        Room randomRoom = existingRooms.get(randomRoomNumber);
-
-        // Pick a side of wall, and then choose a WALL which can be a valid door on a side.
-        // Side = 0: up, 1: down, 2: left, 3: right
-        Position wallPosition = getOneValidWall(randomRoom);
-        world[wallPosition.getX()][wallPosition.getY()] = Tileset.LOCKED_DOOR;
-        doorPosition = new Position(wallPosition.getX(), wallPosition.getY());
+        int doorRoomNumber = getDoorRoomNumber();
+        getDoorPosition(existingRooms.get(doorRoomNumber));
+        world[doorPosition.getX()][doorPosition.getY()] = Tileset.LOCKED_DOOR;
     }
 
-    /**
-     * Returns the position of a WALL which can be a valid door on a specific side.
-     * Side = 0: up, 1: down, 2: left, 3: right
-     */
-    private Position getOneValidWall(Room randomRoom) {
-        int side = RandomUtils.uniform(random, 0, 4);
-        Position wall = randomWall(randomRoom, side);
-        if (isValidDoor(wall, side)) {
-            return wall;
-        }
-        return getOneValidWall(randomRoom);
-    }
-
-    /**
-     * Returns true if a WALL on the side can be a door, false otherwise.
-     * Side = 0: up, 1: down, 2: left, 3: right
-     */
-    private boolean isValidDoor(Position wall, int side) {
-        int wallX = wall.getX();
-        int wallY = wall.getY();
+    private void getDoorPosition(Room room) {
+        int leftX = room.getPosition().getX();
+        int bottomY = room.getPosition().getY();
+        int rightX = leftX + room.getWidth() - 1;
+        int topY = bottomY + room.getHeight() - 1;
+        int x = RandomUtils.uniform(random, leftX + 1, rightX);
+        int y = RandomUtils.uniform(random, bottomY + 1, topY);
+        int side = random.nextInt() % 4;
         switch (side) {
-            case 0:
-                if (world[wallX][wallY - 1] == Tileset.FLOOR) {
-                    if (wallY == height - 1 || world[wallX][wallY + 1] == Tileset.NOTHING) {
-                        return true;
-                    }
+            case 0: // up
+                if (topY == height - 1 && world[x][topY - 1] == Tileset.FLOOR) {
+                    doorPosition = new Position(x, topY);
+                    break;
+                } else if (world[x][topY + 1] == Tileset.NOTHING
+                        && world[x][topY - 1] == Tileset.FLOOR) {
+                    doorPosition = new Position(x, topY);
+                    break;
                 }
-                return false;
-            case 1:
-                if (world[wallX][wallY + 1] == Tileset.FLOOR) {
-                    if (wallY == 0 || world[wallX][wallY - 1] == Tileset.NOTHING) {
-                        return true;
-                    }
+                getDoorPosition(room);
+                break;
+            case 1: // down
+                if (bottomY == 0 && world[x][bottomY + 1] == Tileset.FLOOR) {
+                    doorPosition = new Position(x, bottomY);
+                    break;
+                } else if (world[x][bottomY - 1] == Tileset.NOTHING
+                        && world[x][bottomY + 1] == Tileset.FLOOR) {
+                    doorPosition = new Position(x, bottomY);
+                    break;
                 }
-                return false;
-            case 2:
-                if (world[wallX + 1][wallY] == Tileset.FLOOR) {
-                    if (wallX == 0 || world[wallX - 1][wallY] == Tileset.NOTHING) {
-                        return true;
-                    }
+                getDoorPosition(room);
+                break;
+            case 2: // left
+                if (leftX == 0 && world[leftX + 1][y] == Tileset.FLOOR) {
+                    doorPosition = new Position(leftX, y);
+                    break;
+                } else if (world[leftX - 1][y] == Tileset.NOTHING
+                        && world[leftX + 1][y] == Tileset.FLOOR) {
+                    doorPosition = new Position(leftX, y);
+                    break;
                 }
-                return false;
-            case 3:
-                if (world[wallX - 1][wallY] == Tileset.FLOOR) {
-                    if (wallX == width - 1 || world[wallX + 1][wallY] == Tileset.NOTHING) {
-                        return true;
-                    }
+                getDoorPosition(room);
+                break;
+            case 3: // right
+                if (rightX == width - 1 && world[rightX - 1][y] == Tileset.FLOOR) {
+                    doorPosition = new Position(rightX, y);
+                    break;
+                } else if (world[rightX + 1][y] == Tileset.NOTHING
+                        && world[rightX - 1][y] == Tileset.FLOOR) {
+                    doorPosition = new Position(rightX, y);
+                    break;
                 }
-                return false;
-            default: return false;
+                getDoorPosition(room);
+                break;
+            default:
         }
     }
 
-    /**
-     * Returns the position of a randomly chosen wall on the specific side.
-     * Side = 0: up, 1: down, 2: left, 3: right
-     */
-    private Position randomWall(Room randomRoom, int side) {
-        int roomX = randomRoom.getPosition().getX();
-        int roomY = randomRoom.getPosition().getY();
-        switch (side) {
-            case 0:
-                int x0 = RandomUtils.uniform(random, roomX + 1,
-                        roomX + randomRoom.getWidth() - 1);
-                return new Position(x0, roomY + randomRoom.getHeight() - 1);
-            case 1:
-                int x1 = RandomUtils.uniform(random, roomX + 1,
-                        roomX + randomRoom.getWidth() - 1);
-                return new Position(x1, roomY);
-            case 2:
-                int y2 = RandomUtils.uniform(random, roomY + 1,
-                        roomY + randomRoom.getHeight() - 1);
-                return new Position(roomX, y2);
-            case 3:
-                int y3 = RandomUtils.uniform(random, roomY + 1,
-                        roomY + randomRoom.getHeight() - 1);
-                return new Position(roomX + randomRoom.getWidth() - 1, y3);
-            default: return null;
+    private int getDoorRoomNumber() {
+        int doorRoomNumber = RandomUtils.uniform(random, 0, existingRooms.size());
+        if (doorRoomNumber == playerRoomNumber) {
+            return getDoorRoomNumber();
         }
+        return doorRoomNumber;
     }
 
     /**
