@@ -1,7 +1,12 @@
 package byog.Core;
 
+import byog.InputDemo.InputSource;
+import byog.InputDemo.KeyboardInputSource;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
+import edu.princeton.cs.introcs.StdDraw;
+import java.awt.Color;
+import java.awt.Font;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,22 +14,141 @@ import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import static java.lang.System.exit;
 
 public class Game {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
-    public static final int WIDTH = 80;
-    public static final int HEIGHT = 30;
+    private static final int WIDTH = 80;
+    private static final int HEIGHT = 30;
+    private static final int HEADS_UP_DISPLAY_SIZE = 3;
+    private static final int MENU_WIDTH = 40;
+    private static final int MENU_HEIGHT = 40;
     private World worldMap;
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
-        ter.initialize(WIDTH, HEIGHT);
+        InputSource inputSource = new KeyboardInputSource();
+        StringBuilder savedInput = new StringBuilder();
+        drawMenu();
 
-        // Draw the world on the screen.
-        ter.renderFrame(worldMap.getWorld());
+        while (true) {
+            char firstKey = Character.toUpperCase(inputSource.getNextKey());
+            if (firstKey == 'N') {
+                savedInput.append(firstKey);
+                drawPrompt("");
+                String seedString = solicitSeedInput();
+                savedInput.append(seedString);
+
+                long seed = Long.parseLong(seedString.substring(0, seedString.length() - 1));
+                ter.initialize(WIDTH, HEIGHT + HEADS_UP_DISPLAY_SIZE);
+                worldMap = createOneWorld(seed);
+                ter.renderFrame(worldMap.getWorld());
+                savedInput.append(processMove(inputSource));
+                saveInput(savedInput.toString());
+                exit(0);
+            } else if (firstKey == 'L') {
+                ter.initialize(WIDTH, HEIGHT + HEADS_UP_DISPLAY_SIZE);
+                String previousInput = loadInput();
+                StringBuilder seedString = new StringBuilder();
+                int index = 1;
+                while (previousInput.charAt(index) != 'S') {
+                    seedString.append(previousInput.charAt(index));
+                    index++;
+                }
+                long seed = Long.parseLong(seedString.toString());
+                worldMap = createOneWorld(seed);
+                index++;
+                while (index < previousInput.length()) {
+                    worldMap.move(previousInput.charAt(index));
+                    index++;
+                }
+                ter.renderFrame(worldMap.getWorld());
+                savedInput.append(previousInput);
+
+                savedInput.append(processMove(inputSource));
+                saveInput(savedInput.toString());
+                exit(0);
+            }
+        }
+    }
+
+    /** Process movement and return input string. */
+    private String processMove(InputSource inputSource) {
+        StringBuilder input = new StringBuilder();
+        while (inputSource.possibleNextInput()) {
+            char key = Character.toUpperCase(inputSource.getNextKey());
+            if (key == 'Q') {
+                break;
+            } else if (key == 'W' || key == 'S' || key == 'A' || key == 'D') {
+                input.append(key);
+                worldMap.move(key);
+                ter.renderFrame(worldMap.getWorld());
+            }
+        }
+        return input.toString();
+    }
+
+    /** Ask user to input a seed which is ended with a 'S', and then return it. */
+    private String solicitSeedInput() {
+        StringBuilder input = new StringBuilder();
+        while (!input.toString().contains("S")) {
+            if (!StdDraw.hasNextKeyTyped()) {
+                continue;
+            }
+            char key = Character.toUpperCase(StdDraw.nextKeyTyped());
+            if (key == '0' || key == '1' || key == '2' || key == '3' || key == '4' || key == '5'
+                    || key == '6' || key == '7' || key == '8' || key == '9' || key == 'S') {
+                input.append(key);
+            }
+            drawPrompt(input.toString());
+        }
+        StdDraw.pause(500);
+        return input.toString();
+    }
+
+    /** Prompt for user to type in a seed. */
+    private void drawPrompt(String s) {
+        StdDraw.clear(Color.black);
+        StdDraw.setFont(new Font("Consolas", Font.BOLD, 25));
+        StdDraw.setPenColor(Color.CYAN);
+        StdDraw.text(MENU_WIDTH / 2, MENU_HEIGHT - 10, "Please enter a positive integer!");
+        StdDraw.text(MENU_WIDTH / 2, MENU_HEIGHT - 12,
+                "Press S if you have pressed the final number.");
+
+        StdDraw.setFont(new Font("Monaco", Font.BOLD, 30));
+        StdDraw.setPenColor(Color.white);
+        StdDraw.text(MENU_WIDTH / 2, MENU_HEIGHT / 2, s);
+        StdDraw.show();
+    }
+
+    /** Draw the menu of the game. */
+    private void drawMenu() {
+        ter.initialize(MENU_WIDTH, MENU_HEIGHT);
+        String gameTitle = "CS61B: THE GAME";
+        String newGame = "New Game (N)";
+        String loadGame = "Load Game (L)";
+        String quit = "Quit and Save Game (Q)";
+        int middleWidth = MENU_WIDTH / 2;
+
+        StdDraw.clear(Color.black);
+        StdDraw.setFont(new Font("Monaco", Font.BOLD, 40));
+        StdDraw.setPenColor(Color.orange);
+        StdDraw.text(middleWidth, MENU_HEIGHT - 5, gameTitle);
+
+        StdDraw.setFont(new Font("Monaco", Font.BOLD, 30));
+        StdDraw.setPenColor(Color.yellow);
+        StdDraw.text(middleWidth, MENU_HEIGHT - 15, newGame);
+
+        StdDraw.setPenColor(Color.green);
+        StdDraw.text(middleWidth, MENU_HEIGHT - 20, loadGame);
+
+        StdDraw.setPenColor(Color.red);
+        StdDraw.text(middleWidth, MENU_HEIGHT - 25, quit);
+
+        StdDraw.show();
     }
 
     /**
@@ -118,7 +242,7 @@ public class Game {
 
     /** Load the previous input from savedGame.txt to Game.java. */
     private static String loadInput() {
-        File f = new File("./savedGame.txt");
+        File f = new File("./SavedGame.txt");
         if (f.exists()) {
             try {
                 FileInputStream fs = new FileInputStream(f);
@@ -128,13 +252,13 @@ public class Game {
                 return loadInput;
             } catch (FileNotFoundException e) {
                 System.out.println("file not found");
-                System.exit(0);
+                exit(0);
             } catch (IOException e) {
                 System.out.println(e);
-                System.exit(0);
+                exit(0);
             } catch (ClassNotFoundException e) {
                 System.out.println("class not found");
-                System.exit(0);
+                exit(0);
             }
         }
         return "";
@@ -142,7 +266,7 @@ public class Game {
 
     /** Save input to the file savedGame.txt. */
     private static void saveInput(String input) {
-        File f = new File("./savedGame.txt");
+        File f = new File("./SavedGame.txt");
         try {
             if (!f.exists()) {
                 f.createNewFile();
@@ -153,10 +277,10 @@ public class Game {
             os.close();
         }  catch (FileNotFoundException e) {
             System.out.println("file not found");
-            System.exit(0);
+            exit(0);
         } catch (IOException e) {
             System.out.println(e);
-            System.exit(0);
+            exit(0);
         }
     }
 }
