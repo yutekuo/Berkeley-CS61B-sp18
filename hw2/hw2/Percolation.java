@@ -134,6 +134,7 @@ public class Percolation {
 
     /** Use for unit testing (not required) */
     public static void main(String[] args) {
-
+        Percolation p = new Percolation(10);
+        p.open(-1, 5);
     }
 }
