@@ -21,9 +21,9 @@ public class PercolationStats {
             throw new IllegalArgumentException("N and T must be greater than zero.");
         }
         threshold = new double[T];
-        Percolation p = pf.make(N);
         int count = 0;
         while (count < T) {
+            Percolation p = pf.make(N);
             while (!p.percolates()) {
                 int row = StdRandom.uniform(0, N);
                 int col = StdRandom.uniform(0, N);

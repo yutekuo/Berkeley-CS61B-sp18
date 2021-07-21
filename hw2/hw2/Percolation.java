@@ -47,7 +47,7 @@ public class Percolation {
     /** Open the site (row, col) if it is not open already. */
     public void open(int row, int col) {
         if (!areInputsValid(row, col)) {
-            throw new IllegalArgumentException(
+            throw new IndexOutOfBoundsException(
                     "The row and column indices must be integers between 0 and N − 1.");
         }
 
@@ -106,7 +106,7 @@ public class Percolation {
     /** Is the site (row, col) open? */
     public boolean isOpen(int row, int col) {
         if (!areInputsValid(row, col)) {
-            throw new IllegalArgumentException(
+            throw new IndexOutOfBoundsException(
                     "The row and column indices must be integers between 0 and N − 1.");
         }
         return isSiteOpen[row][col];
@@ -115,7 +115,7 @@ public class Percolation {
     /** Is the site (row, col) full? */
     public boolean isFull(int row, int col) {
         if (!areInputsValid(row, col)) {
-            throw new IllegalArgumentException(
+            throw new IndexOutOfBoundsException(
                     "The row and column indices must be integers between 0 and N − 1.");
         }
 
