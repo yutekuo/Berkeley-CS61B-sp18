@@ -42,8 +42,8 @@ public class TestComplexOomage {
         // Your code here.
         ArrayList<Integer> params = new ArrayList<>();
         for (int i = 1; i <= 10; i++) {
-            for (int j = 1; j < 4; j++) {
-                params.add(1);
+            for (int x = 1; x < i; x++) {
+                params.add(x * 5); // Make every hashCode end with 0 or 5.
             }
             deadlyList.add(new ComplexOomage(params));
             params.clear();
