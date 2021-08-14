@@ -137,7 +137,7 @@ public class Game {
         StdDraw.textLeft(10, MENU_HEIGHT - 20, "S: Move Down");
         StdDraw.textLeft(10, MENU_HEIGHT - 25, "D: Move Right");
         StdDraw.show();
-        StdDraw.pause(5000);
+        StdDraw.pause(3000);
     }
 
     /** Prompt for user to type in a seed. */
