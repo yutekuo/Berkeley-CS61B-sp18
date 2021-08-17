@@ -3,7 +3,6 @@ package hw4.puzzle;
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Stack;
 
-
 public class Solver {
     private int totalMoves = 0;
     private SearchNode goal;
