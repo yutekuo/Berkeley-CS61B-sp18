@@ -41,6 +41,7 @@ public class Solver {
             SearchNode X = pq.delMin();
             if (X.worldState.isGoal()) {
                 goal = X;
+                totalMoves = goal.moves;
                 break;
             }
 
@@ -51,7 +52,6 @@ public class Solver {
             }
         }
 
-        totalMoves = goal.moves;
         while (goal != null) {
             seqOfWorldState.push(goal.worldState);
             goal = goal.prev;
