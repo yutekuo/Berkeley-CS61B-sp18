@@ -64,14 +64,16 @@ public class QuickSort {
         if (items.size() <= 1) {
             return items;
         }
+        Queue<Item> sorted = new Queue<>();
         Queue<Item> less = new Queue<>();
         Queue<Item> equal = new Queue<>();
         Queue<Item> greater = new Queue<>();
         Item pivot = getRandomItem(items);
         partition(items, pivot, less, equal, greater);
+        sorted = catenate(catenate(less, equal), greater);
         quickSort(less);
         quickSort(greater);
-        return catenate(catenate(less, equal), greater);
+        return sorted;
     }
 
     public static void main(String[] args) {
