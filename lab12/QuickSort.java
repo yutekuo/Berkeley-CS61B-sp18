@@ -64,41 +64,44 @@ public class QuickSort {
         if (items.size() <= 1) {
             return items;
         }
-        Queue<Item> sorted = new Queue<>();
         Queue<Item> less = new Queue<>();
         Queue<Item> equal = new Queue<>();
         Queue<Item> greater = new Queue<>();
         Item pivot = getRandomItem(items);
         partition(items, pivot, less, equal, greater);
-        sorted = catenate(catenate(less, equal), greater);
-        quickSort(less);
-        quickSort(greater);
-        return sorted;
+        return catenate(catenate(quickSort(less), equal), quickSort(greater));
     }
 
     public static void main(String[] args) {
-        Queue<String> students = new Queue<>();
-        students.enqueue("Alice");
-        students.enqueue("Vanessa");
-        students.enqueue("Ethan");
+        Queue<Integer> numbers = new Queue<>();
+        numbers.enqueue(0);
+        numbers.enqueue(0);
+        numbers.enqueue(1);
+        numbers.enqueue(1);
+        numbers.enqueue(9);
+        numbers.enqueue(9);
+        numbers.enqueue(3);
+        numbers.enqueue(8);
+        numbers.enqueue(7);
+        numbers.enqueue(4);
 
         System.out.println("Unsorted queue:");
-        for (String s : students) {
-            System.out.print(s + " ");
+        for (int n : numbers) {
+            System.out.print(n + " ");
         }
         System.out.println();
 
-        Queue<String> sortedStudents = QuickSort.quickSort(students);
+        Queue<Integer> sortedNumbers = QuickSort.quickSort(numbers);
 
         System.out.println("Original queue:");
-        for (String s : students) {
-            System.out.print(s + " ");
+        for (int n : numbers) {
+            System.out.print(n + " ");
         }
         System.out.println();
 
         System.out.println("Sorted queue:");
-        for (String s : sortedStudents) {
-            System.out.print(s + " ");
+        for (int n : sortedNumbers) {
+            System.out.print(n + " ");
         }
         System.out.println();
     }
