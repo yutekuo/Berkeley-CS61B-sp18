@@ -8,9 +8,10 @@ import java.util.Map;
  * not draw the output correctly.
  */
 public class Rasterer {
+    private static final double ROOT_WIDTH = MapServer.ROOT_LRLON - MapServer.ROOT_ULLON;
+    private static final double ROOT_HEIGHT = MapServer.ROOT_ULLAT - MapServer.ROOT_LRLAT;
 
     public Rasterer() {
-        // YOUR CODE HERE
     }
 
     /**
@@ -43,10 +44,100 @@ public class Rasterer {
      */
     public Map<String, Object> getMapRaster(Map<String, Double> params) {
         // System.out.println(params);
+        double queryBoxLonDPP = getQueryBoxLonDPP(params);
+        int depth = getBestDepth(queryBoxLonDPP);
+        double leftX = getLeftX(params, depth);
+        double rightX = getRightX(params, depth);
+        double upperY = getUpperY(params, depth);
+        double lowerY = getLowerY(params, depth);
+        String[][] pngFiles = getFilesArray();
+
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented getMapRaster, nothing is displayed in "
-                           + "your browser.");
+        results.put("render_grid", pngFiles);
+        results.put("raster_ul_lon", leftX);
+        results.put("raster_ul_lat", upperY);
+        results.put("raster_lr_lon", rightX);
+        results.put("raster_lr_lat", lowerY);
+        results.put("depth", depth);
         return results;
     }
 
+    /**
+     * Returns a String[][] which is composed of specific png files.
+     */
+    private String[][] getFilesArray() {
+        return null;
+    }
+
+    /**
+     * Returns the bottom y-position of the tiles that can cover the query box.
+     */
+    private double getLowerY(Map<String, Double> params, int depth) {
+        double tileHeight = ROOT_HEIGHT / Math.pow(2, depth);
+        double y = MapServer.ROOT_ULLAT;
+        while (y > params.get("lrlat")) {
+            y -= tileHeight;
+        }
+        return y;
+    }
+
+    /**
+     * Returns the top y-position of the tiles that can cover the query box.
+     */
+    private double getUpperY(Map<String, Double> params, int depth) {
+        double tileHeight = ROOT_HEIGHT / Math.pow(2, depth);
+        double y = MapServer.ROOT_ULLAT;
+        while (y >= params.get("ullat")) {
+            y -= tileHeight;
+        }
+        return y + tileHeight;
+    }
+
+    /**
+     * Returns the rightmost x-position of the tiles that can cover the query box.
+     */
+    private double getRightX(Map<String, Double> params, int depth) {
+        double tileWidth = ROOT_WIDTH / Math.pow(2, depth);
+        double x = MapServer.ROOT_ULLON;
+        while (x < params.get("lrlon")) {
+            x += tileWidth;
+        }
+        return x;
+    }
+
+    /**
+     * Returns the leftmost x-position of the tiles that can cover the query box.
+     */
+    private double getLeftX(Map<String, Double> params, int depth) {
+        double tileWidth = ROOT_WIDTH / Math.pow(2, depth);
+        double x = MapServer.ROOT_ULLON;
+        while (x <= params.get("ullon")) {
+            x += tileWidth;
+        }
+        return x - tileWidth;
+    }
+
+    /**
+     * Returns the LonDPP o the query box.
+     */
+    private double getQueryBoxLonDPP(Map<String, Double> params) {
+        double lrlon = params.get("lrlon");
+        double ullon = params.get("ullon");
+        double width = params.get("w");
+        return (lrlon - ullon) / width;
+    }
+
+    /**
+     * Returns the best depth of the tile that has the greatest LonDPP that
+     * is less than or equal to the LonDPP of the query box.
+     */
+    private int getBestDepth(double qbLonDPP) {
+        double d0LonDPP = ROOT_WIDTH / MapServer.TILE_SIZE;
+        int depth = 0;
+        while (d0LonDPP > qbLonDPP) {
+            d0LonDPP /= 2;
+            depth++;
+        }
+        return depth;
+    }
 }
