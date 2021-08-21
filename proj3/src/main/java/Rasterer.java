@@ -50,7 +50,8 @@ public class Rasterer {
         double rightX = getRightX(params, depth);
         double upperY = getUpperY(params, depth);
         double lowerY = getLowerY(params, depth);
-        String[][] pngFiles = getFilesArray();
+        String[][] pngFiles = getFilesArray(depth, leftX, rightX, upperY, lowerY);
+        boolean isQueryBoxInBound = getQuerySuccess(params);
 
         Map<String, Object> results = new HashMap<>();
         results.put("render_grid", pngFiles);
@@ -59,14 +60,51 @@ public class Rasterer {
         results.put("raster_lr_lon", rightX);
         results.put("raster_lr_lat", lowerY);
         results.put("depth", depth);
+        results.put("query_success", isQueryBoxInBound);
         return results;
     }
 
     /**
-     * Returns a String[][] which is composed of specific png files.
+     * Returns true if the query box is inside the bound of the ROOT, false for
+     * outside the ROOT or query box's ullon, ullat is located to the right of its lrlon, lrlat.
      */
-    private String[][] getFilesArray() {
-        return null;
+    private boolean getQuerySuccess(Map<String, Double> params) {
+        if (params.get("ullon") < MapServer.ROOT_ULLON ||
+                params.get("ullon") >= MapServer.ROOT_LRLON ||
+                params.get("lrlon") <= MapServer.ROOT_ULLON ||
+                params.get("lrlon") > MapServer.ROOT_LRLAT ||
+                params.get("ullat") > MapServer.ROOT_ULLAT ||
+                params.get("ullat") <= MapServer.ROOT_LRLAT ||
+                params.get("lrlat") >= MapServer.ROOT_ULLAT ||
+                params.get("lrlat") < MapServer.ROOT_LRLAT ||
+                params.get("ullon") >= params.get("lrlon") ||
+                params.get("ullat") <= params.get("lrlat")) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Returns a String[][] which is composed of specific png files that can cover the query box.
+     */
+    private String[][] getFilesArray(int depth, double leftX,
+                                     double rightX, double upperY, double lowerY) {
+        double tileWidth = ROOT_WIDTH / Math.pow(2, depth);
+        double tileHeight = ROOT_HEIGHT / Math.pow(2, depth);
+        int col = (int) ((rightX - leftX) / tileWidth);
+        int row = (int) ((upperY - lowerY) / tileHeight);
+        int fixedStartX = (int) ((leftX - MapServer.ROOT_ULLON) / tileWidth);
+        int startY = (int) ((MapServer.ROOT_ULLAT - upperY) / tileHeight);
+        String[][] files = new String[row][col];
+        for (int r = 0; r < row; r++) {
+            int startX = fixedStartX;
+            for (int c = 0; c < col; c++) {
+                files[r][c] = "d" + depth + "_x" + startX + "_y" + startY + ".png";
+                startX++;
+            }
+            startY++;
+        }
+        return files;
     }
 
     /**
