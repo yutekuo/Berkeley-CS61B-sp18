@@ -73,14 +73,10 @@ public class Rasterer {
      * outside the ROOT or query box's ullon, ullat is located to the right of its lrlon, lrlat.
      */
     private boolean getQuerySuccess(Map<String, Double> params) {
-        if (params.get("ullon") < MapServer.ROOT_ULLON
-                || params.get("ullon") >= MapServer.ROOT_LRLON
+        if (params.get("ullon") >= MapServer.ROOT_LRLON
                 || params.get("lrlon") <= MapServer.ROOT_ULLON
-                || params.get("lrlon") > MapServer.ROOT_LRLAT
-                || params.get("ullat") > MapServer.ROOT_ULLAT
                 || params.get("ullat") <= MapServer.ROOT_LRLAT
                 || params.get("lrlat") >= MapServer.ROOT_ULLAT
-                || params.get("lrlat") < MapServer.ROOT_LRLAT
                 || params.get("ullon") >= params.get("lrlon")
                 || params.get("ullat") <= params.get("lrlat")) {
             return false;
