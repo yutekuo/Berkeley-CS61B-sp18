@@ -46,11 +46,15 @@ public class Rasterer {
         // System.out.println(params);
         double queryBoxLonDPP = getQueryBoxLonDPP(params);
         int depth = getBestDepth(queryBoxLonDPP);
-        double leftX = getLeftX(params, depth);
-        double rightX = getRightX(params, depth);
-        double upperY = getUpperY(params, depth);
-        double lowerY = getLowerY(params, depth);
-        String[][] pngFiles = getFilesArray(depth, leftX, rightX, upperY, lowerY);
+        double leftX = getLeftX(params, depth)[0];
+        double rightX = getRightX(params, depth)[0];
+        double upperY = getUpperY(params, depth)[0];
+        double lowerY = getLowerY(params, depth)[0];
+        double xStart = getLeftX(params, depth)[1];
+        double xEnd = getRightX(params, depth)[1];
+        double yStart = getUpperY(params, depth)[1];
+        double yEnd = getLowerY(params, depth)[1];
+        String[][] pngFiles = getFilesArray(depth, xStart, xEnd, yStart, yEnd);
         boolean isQueryBoxInBound = getQuerySuccess(params);
 
         Map<String, Object> results = new HashMap<>();
@@ -69,16 +73,16 @@ public class Rasterer {
      * outside the ROOT or query box's ullon, ullat is located to the right of its lrlon, lrlat.
      */
     private boolean getQuerySuccess(Map<String, Double> params) {
-        if (params.get("ullon") < MapServer.ROOT_ULLON ||
-                params.get("ullon") >= MapServer.ROOT_LRLON ||
-                params.get("lrlon") <= MapServer.ROOT_ULLON ||
-                params.get("lrlon") > MapServer.ROOT_LRLAT ||
-                params.get("ullat") > MapServer.ROOT_ULLAT ||
-                params.get("ullat") <= MapServer.ROOT_LRLAT ||
-                params.get("lrlat") >= MapServer.ROOT_ULLAT ||
-                params.get("lrlat") < MapServer.ROOT_LRLAT ||
-                params.get("ullon") >= params.get("lrlon") ||
-                params.get("ullat") <= params.get("lrlat")) {
+        if (params.get("ullon") < MapServer.ROOT_ULLON
+                || params.get("ullon") >= MapServer.ROOT_LRLON
+                || params.get("lrlon") <= MapServer.ROOT_ULLON
+                || params.get("lrlon") > MapServer.ROOT_LRLAT
+                || params.get("ullat") > MapServer.ROOT_ULLAT
+                || params.get("ullat") <= MapServer.ROOT_LRLAT
+                || params.get("lrlat") >= MapServer.ROOT_ULLAT
+                || params.get("lrlat") < MapServer.ROOT_LRLAT
+                || params.get("ullon") >= params.get("lrlon")
+                || params.get("ullat") <= params.get("lrlat")) {
             return false;
         }
         return true;
@@ -87,17 +91,14 @@ public class Rasterer {
     /**
      * Returns a String[][] which is composed of specific png files that can cover the query box.
      */
-    private String[][] getFilesArray(int depth, double leftX,
-                                     double rightX, double upperY, double lowerY) {
-        double tileWidth = ROOT_WIDTH / Math.pow(2, depth);
-        double tileHeight = ROOT_HEIGHT / Math.pow(2, depth);
-        int col = (int) ((rightX - leftX) / tileWidth);
-        int row = (int) ((upperY - lowerY) / tileHeight);
-        int fixedStartX = (int) ((leftX - MapServer.ROOT_ULLON) / tileWidth);
-        int startY = (int) ((MapServer.ROOT_ULLAT - upperY) / tileHeight);
+    private String[][] getFilesArray(int depth, double xStart, double xEnd,
+                                     double yStart, double yEnd) {
+        int col = (int) (xEnd - xStart + 1);
+        int row = (int) (yEnd - yStart + 1);
+        int startY = (int) yStart;
         String[][] files = new String[row][col];
         for (int r = 0; r < row; r++) {
-            int startX = fixedStartX;
+            int startX = (int) xStart;
             for (int c = 0; c < col; c++) {
                 files[r][c] = "d" + depth + "_x" + startX + "_y" + startY + ".png";
                 startX++;
@@ -108,51 +109,71 @@ public class Rasterer {
     }
 
     /**
-     * Returns the bottom y-position of the tiles that can cover the query box.
+     * Returns the bottom y-position of the tiles and yEnd that can cover the query box.
      */
-    private double getLowerY(Map<String, Double> params, int depth) {
+    private double[] getLowerY(Map<String, Double> params, int depth) {
+        double[] result = new double[2];
         double tileHeight = ROOT_HEIGHT / Math.pow(2, depth);
         double y = MapServer.ROOT_ULLAT;
+        int count = -1;
         while (y > params.get("lrlat")) {
             y -= tileHeight;
+            count++;
         }
-        return y;
+        result[0] = y;
+        result[1] = count;
+        return result;
     }
 
     /**
-     * Returns the top y-position of the tiles that can cover the query box.
+     * Returns the top y-position of the tiles and yStart that can cover the query box.
      */
-    private double getUpperY(Map<String, Double> params, int depth) {
+    private double[] getUpperY(Map<String, Double> params, int depth) {
+        double[] result = new double[2];
         double tileHeight = ROOT_HEIGHT / Math.pow(2, depth);
         double y = MapServer.ROOT_ULLAT;
+        int count = -1;
         while (y >= params.get("ullat")) {
             y -= tileHeight;
+            count++;
         }
-        return y + tileHeight;
+        result[0] =  y + tileHeight;
+        result[1] = count;
+        return result;
     }
 
     /**
-     * Returns the rightmost x-position of the tiles that can cover the query box.
+     * Returns the rightmost x-position of the tiles and xEnd that can cover the query box.
      */
-    private double getRightX(Map<String, Double> params, int depth) {
+    private double[] getRightX(Map<String, Double> params, int depth) {
+        double[] result = new double[2];
         double tileWidth = ROOT_WIDTH / Math.pow(2, depth);
         double x = MapServer.ROOT_ULLON;
+        int count = -1;
         while (x < params.get("lrlon")) {
             x += tileWidth;
+            count++;
         }
-        return x;
+        result[0] = x;
+        result[1] = count;
+        return result;
     }
 
     /**
-     * Returns the leftmost x-position of the tiles that can cover the query box.
+     * Returns the leftmost x-position of the tiles and xStart that can cover the query box.
      */
-    private double getLeftX(Map<String, Double> params, int depth) {
+    private double[] getLeftX(Map<String, Double> params, int depth) {
+        double[] result = new double[2];
         double tileWidth = ROOT_WIDTH / Math.pow(2, depth);
         double x = MapServer.ROOT_ULLON;
+        int count = -1;
         while (x <= params.get("ullon")) {
             x += tileWidth;
+            count++;
         }
-        return x - tileWidth;
+        result[0] = x - tileWidth;
+        result[1] = count;
+        return result;
     }
 
     /**
@@ -172,9 +193,12 @@ public class Rasterer {
     private int getBestDepth(double qbLonDPP) {
         double d0LonDPP = ROOT_WIDTH / MapServer.TILE_SIZE;
         int depth = 0;
-        while (d0LonDPP > qbLonDPP) {
+        while (d0LonDPP > qbLonDPP && depth <= 7) {
             d0LonDPP /= 2;
             depth++;
+        }
+        if (depth > 7) {
+            depth = 7;
         }
         return depth;
     }
