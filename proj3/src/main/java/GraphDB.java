@@ -3,12 +3,15 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -22,28 +25,25 @@ import java.util.Map;
 public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
+    private final Map<Long, Node> nodes = new LinkedHashMap<>();
+
     private static class Node {
         long id;
         double lat;
         double lon;
-        ArrayList<Long> adj;
+        Set<Long> adj;
         String name = null;
 
-        Node(long _id, double _lat, double _lon) {
-            id = _id;
-            lat = _lat;
-            lon = _lon;
-            adj = new ArrayList<>();
+        Node(long id, double lat, double lon) {
+            this.id = id;
+            this.lat = lat;
+            this.lon = lon;
+            adj = new HashSet<>();
         }
     }
 
-    private final Map<Long, Node> nodes = new LinkedHashMap<>();
-
-    /**
-     * Give the node a name to identify its location.
-     */
-    public void createLocation(long id, String nodeName) {
-        nodes.get(id).name = cleanString(nodeName);
+    public void setNodeName(long id, String nodeName) {
+        nodes.get(id).name = nodeName;
     }
 
     /**
@@ -58,9 +58,9 @@ public class GraphDB {
     }
 
     /**
-     * Adds an edge between vertex v and w.
+     * Adds an edge between node v and w.
      * @param v one end of the edge.
-     * @param w another end of the edge.
+     * @param w the other end of the edge.
      */
     public void addEdge(long v, long w) {
         nodes.get(v).adj.add(w);
@@ -103,11 +103,53 @@ public class GraphDB {
      *  we can reasonably assume this since typically roads are connected.
      */
     private void clean() {
+        List<Long> deletedNode = new ArrayList<>();
         for (long id : nodes.keySet()) {
             if (nodes.get(id).adj.isEmpty()) {
-                nodes.remove(id);
+                deletedNode.add(id);
             }
         }
+
+        for (int i = 0; i < deletedNode.size(); i++) {
+            nodes.remove(deletedNode.get(i));
+        }
+    }
+
+    /**
+     * Returns the vertex closest to the given longitude and latitude.
+     * @param lon The target longitude.
+     * @param lat The target latitude.
+     * @return The id of the node in the graph closest to the target.
+     */
+    long closest(double lon, double lat) {
+        long closest = 0;
+        double minDistance = Double.MAX_VALUE;
+        for (long id : nodes.keySet()) {
+            double curDistance = distance(lon(id), lat(id), lon, lat);
+            if (curDistance < minDistance) {
+                closest = id;
+                minDistance = curDistance;
+            }
+        }
+        return closest;
+    }
+
+    /**
+     * Gets the longitude of a vertex.
+     * @param v The id of the vertex.
+     * @return The longitude of the vertex.
+     */
+    double lon(long v) {
+        return nodes.get(v).lon;
+    }
+
+    /**
+     * Gets the latitude of a vertex.
+     * @param v The id of the vertex.
+     * @return The latitude of the vertex.
+     */
+    double lat(long v) {
+        return nodes.get(v).lat;
     }
 
     /**
@@ -176,42 +218,5 @@ public class GraphDB {
         double x = Math.cos(phi1) * Math.sin(phi2);
         x -= Math.sin(phi1) * Math.cos(phi2) * Math.cos(lambda2 - lambda1);
         return Math.toDegrees(Math.atan2(y, x));
-    }
-
-    /**
-     * Returns the vertex closest to the given longitude and latitude.
-     * @param lon The target longitude.
-     * @param lat The target latitude.
-     * @return The id of the node in the graph closest to the target.
-     */
-    long closest(double lon, double lat) {
-        long closest = 0;
-        double minDistance = Double.MAX_VALUE;
-        for (long id : nodes.keySet()) {
-            double curDistance = distance(lon(id), lat(id), lon, lat);
-            if (curDistance < minDistance) {
-                closest = id;
-                minDistance = curDistance;
-            }
-        }
-        return closest;
-    }
-
-    /**
-     * Gets the longitude of a vertex.
-     * @param v The id of the vertex.
-     * @return The longitude of the vertex.
-     */
-    double lon(long v) {
-        return nodes.get(v).lon;
-    }
-
-    /**
-     * Gets the latitude of a vertex.
-     * @param v The id of the vertex.
-     * @return The latitude of the vertex.
-     */
-    double lat(long v) {
-        return nodes.get(v).lat;
     }
 }
