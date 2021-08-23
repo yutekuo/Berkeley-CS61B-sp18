@@ -62,6 +62,9 @@ public class Router {
 
         while (!fringe.isEmpty()) {
             long v = fringe.remove();
+            if (v == tid) {
+                break;
+            }
             marked.put(v, true);
 
             for (long w : g.adjacent(v)) {
