@@ -22,11 +22,12 @@ import java.util.Map;
 public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
-    private class Node {
+    private static class Node {
         long id;
         double lat;
         double lon;
         ArrayList<Long> adj;
+        String name = null;
 
         Node(long _id, double _lat, double _lon) {
             id = _id;
@@ -39,10 +40,20 @@ public class GraphDB {
     private final Map<Long, Node> nodes = new LinkedHashMap<>();
 
     /**
-     * Adds a node to the graph.
-     * @param n a node that is going to be added to the graph.
+     * Give the node a name to identify its location.
      */
-    public void addNode(Node n) {
+    public void createLocation(long id, String nodeName) {
+        nodes.get(id).name = cleanString(nodeName);
+    }
+
+    /**
+     * Adds a node to the graph.
+     * @param id of a node that is going to be added to the graph.
+     * @param lat of a node that is going to be added to the graph.
+     * @param lon of a node that is going to be added to the graph.
+     */
+    public void addNode(long id, double lat, double lon) {
+        Node n = new Node(id, lat, lon);
         nodes.put(n.id, n);
     }
 
