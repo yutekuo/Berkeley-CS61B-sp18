@@ -1,5 +1,11 @@
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +31,56 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        return null; // FIXME
+        long sid = g.closest(stlon, stlat);
+        long tid = g.closest(destlon, destlat);
+        Map<Long, Double> distTo = new HashMap<>();
+        Map<Long, Long> edgeTo = new HashMap<>();
+        Map<Long, Boolean> marked = new HashMap<>();
+
+        class IDComparator implements Comparator<Long> {
+            @Override
+            public int compare(Long v, Long w) {
+                double vCost = distTo.get(v) + g.distance(v, tid);
+                double wCost = distTo.get(w) + g.distance(w, tid);
+                if (vCost < wCost) {
+                    return -1;
+                } else if (vCost == wCost) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+        }
+        PriorityQueue<Long> fringe = new PriorityQueue<>(new IDComparator());
+
+        for (long vid : g.vertices()) {
+            distTo.put(vid, Double.POSITIVE_INFINITY);
+            marked.put(vid, false);
+            fringe.add(vid);
+        }
+        distTo.put(sid, 0.0);
+
+        while (!fringe.isEmpty()) {
+            long v = fringe.remove();
+            marked.put(v, true);
+
+            for (long w : g.adjacent(v)) {
+                if (!marked.get(w)) {
+                    if (distTo.get(v) + g.distance(v, w) < distTo.get(w)) {
+                        distTo.put(w, distTo.get(v) + g.distance(v, w));
+                        edgeTo.put(w, v);
+                    }
+                }
+            }
+        }
+
+        List<Long> path = new ArrayList<>();
+        for (long v = tid; v != sid; v = edgeTo.get(v)) {
+            path.add(v);
+        }
+        path.add(sid);
+        Collections.reverse(path);
+        return path;
     }
 
     /**
