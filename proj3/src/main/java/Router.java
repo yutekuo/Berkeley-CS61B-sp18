@@ -24,7 +24,7 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        long sid = g.closest(stlon, stlat);
+  /*      long sid = g.closest(stlon, stlat);
         long tid = g.closest(destlon, destlat);
         Map<Long, Double> distTo = new HashMap<>();
         Map<Long, Long> edgeTo = new HashMap<>();
@@ -78,7 +78,64 @@ public class Router {
         }
         path.add(sid);
         Collections.reverse(path);
-        return path;
+        return path;*/
+        HashMap<Long, Double> distTo = new HashMap<>();
+        HashMap<Long, Long> edges = new HashMap<>();
+
+
+        Long sourceID = g.closest(stlon, stlat);
+
+        Long destID = g.closest(destlon, destlat);
+
+        class NodeComparator implements Comparator<Long> {
+            @Override
+            public int compare(Long n1, Long n2) {
+                double d1 = distTo.get(n1) + g.distance(n1, destID);
+                double d2 = distTo.get(n2) + g.distance(n2, destID);
+                return Double.compare(d1, d2);
+            }
+        }
+
+        PriorityQueue<Long> minQueue = new PriorityQueue<>(new NodeComparator());
+        minQueue.add(sourceID);
+
+        for (Long l : g.vertices()) {
+            if (l.equals(sourceID)) {
+                distTo.put(l, 0.0);
+            } else {
+                distTo.put(l, Double.MAX_VALUE);
+            }
+            edges.put(l, 0L);
+        }
+
+        while(!minQueue.isEmpty()) {
+            Long currentNode = minQueue.remove();
+            long currentId = currentNode;
+
+            if (currentId == destID) {
+                break;
+            }
+
+            for (Long w : g.adjacent(currentId)) {
+                if (distTo.get(w) > distTo.get(currentId) + g.distance(w, currentId)) {
+                    distTo.replace(w, distTo.get(currentId) + g.distance(w, currentId));
+                    edges.replace(w, currentId);
+                    minQueue.remove(w);
+                    minQueue.add(w);
+                }
+            }
+        }
+
+        ArrayList<Long> direction = new ArrayList<>();
+        Long current = destID;
+        while (!current.equals(sourceID) && !current.equals(0L)) {
+            direction.add(0, current);
+            current = edges.get(current);
+        }
+        direction.add(0, sourceID);
+
+        return direction;
+
     }
 
     /**
