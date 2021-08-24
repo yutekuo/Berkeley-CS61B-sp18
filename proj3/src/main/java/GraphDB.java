@@ -43,7 +43,7 @@ public class GraphDB {
     }
 
     public void setNodeName(long id, String nodeName) {
-        nodes.get(id).name = nodeName;
+        nodes.get(id).name = cleanString(nodeName);
     }
 
     /**
