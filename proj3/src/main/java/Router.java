@@ -65,7 +65,7 @@ public class Router {
         }
 
         LinkedList<Long> path = new LinkedList<>();
-        for (long v = tid; v != sid; v = edgeTo.get(v)) {
+        for (long v = tid; v != sid && v != 0L; v = edgeTo.get(v)) {
             path.addFirst(v);
         }
         path.addFirst(sid);
