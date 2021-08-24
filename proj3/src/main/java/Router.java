@@ -56,10 +56,8 @@ public class Router {
         for (long vid : g.vertices()) {
             distTo.put(vid, Double.POSITIVE_INFINITY);
             marked.put(vid, false);
-            fringe.add(vid);
         }
         distTo.put(sid, 0.0);
-        fringe.remove(sid);
         fringe.add(sid);
 
         while (!fringe.isEmpty()) {
@@ -74,7 +72,6 @@ public class Router {
                     if (distTo.get(v) + g.distance(v, w) < distTo.get(w)) {
                         distTo.put(w, distTo.get(v) + g.distance(v, w));
                         edgeTo.put(w, v);
-                        fringe.remove(w);
                         fringe.add(w);
                     }
                 }
