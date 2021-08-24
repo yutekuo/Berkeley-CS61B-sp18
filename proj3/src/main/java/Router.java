@@ -24,118 +24,52 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-  /*      long sid = g.closest(stlon, stlat);
+        long sid = g.closest(stlon, stlat);
         long tid = g.closest(destlon, destlat);
         Map<Long, Double> distTo = new HashMap<>();
         Map<Long, Long> edgeTo = new HashMap<>();
-        Map<Long, Boolean> marked = new HashMap<>();
 
         class IDComparator implements Comparator<Long> {
             @Override
             public int compare(Long v, Long w) {
                 double vCost = distTo.get(v) + g.distance(v, tid);
                 double wCost = distTo.get(w) + g.distance(w, tid);
-                if (vCost < wCost) {
-                    return -1;
-                } else if (vCost == wCost) {
-                    return 0;
-                } else {
-                    return 1;
-                }
+                return Double.compare(vCost, wCost);
             }
         }
-        PriorityQueue<Long> fringe = new PriorityQueue<>(new IDComparator());
 
-        for (long vid : g.vertices()) {
-            distTo.put(vid, Double.POSITIVE_INFINITY);
-            marked.put(vid, false);
+        PriorityQueue<Long> fringe = new PriorityQueue<>(new IDComparator());
+        for (long v : g.vertices()) {
+            if (v == sid) {
+                distTo.put(sid, 0.0);
+            } else {
+                distTo.put(v, Double.POSITIVE_INFINITY);
+            }
+            edgeTo.put(v, 0L);
         }
-        distTo.put(sid, 0.0);
         fringe.add(sid);
 
         while (!fringe.isEmpty()) {
-            long v = fringe.poll();
-            if (marked.get(v)) {
-                continue;
-            }
+            long v = fringe.remove();
             if (v == tid) {
                 break;
             }
-            marked.put(v, true);
 
             for (long w : g.adjacent(v)) {
                 if (distTo.get(v) + g.distance(v, w) < distTo.get(w)) {
-                    distTo.put(w, distTo.get(v) + g.distance(v, w));
-                    edgeTo.put(w, v);
+                    distTo.replace(w, distTo.get(v) + g.distance(v, w));
+                    edgeTo.replace(w, v);
                     fringe.add(w);
                 }
             }
         }
 
-        List<Long> path = new ArrayList<>();
+        LinkedList<Long> path = new LinkedList<>();
         for (long v = tid; v != sid; v = edgeTo.get(v)) {
-            path.add(v);
+            path.addFirst(v);
         }
-        path.add(sid);
-        Collections.reverse(path);
-        return path;*/
-        HashMap<Long, Double> distTo = new HashMap<>();
-        HashMap<Long, Long> edges = new HashMap<>();
-
-
-        Long sourceID = g.closest(stlon, stlat);
-
-        Long destID = g.closest(destlon, destlat);
-
-        class NodeComparator implements Comparator<Long> {
-            @Override
-            public int compare(Long n1, Long n2) {
-                double d1 = distTo.get(n1) + g.distance(n1, destID);
-                double d2 = distTo.get(n2) + g.distance(n2, destID);
-                return Double.compare(d1, d2);
-            }
-        }
-
-        PriorityQueue<Long> minQueue = new PriorityQueue<>(new NodeComparator());
-        minQueue.add(sourceID);
-
-        for (Long l : g.vertices()) {
-            if (l.equals(sourceID)) {
-                distTo.put(l, 0.0);
-            } else {
-                distTo.put(l, Double.MAX_VALUE);
-            }
-            edges.put(l, 0L);
-        }
-
-        while(!minQueue.isEmpty()) {
-            Long currentNode = minQueue.remove();
-            long currentId = currentNode;
-
-            if (currentId == destID) {
-                break;
-            }
-
-            for (Long w : g.adjacent(currentId)) {
-                if (distTo.get(w) > distTo.get(currentId) + g.distance(w, currentId)) {
-                    distTo.replace(w, distTo.get(currentId) + g.distance(w, currentId));
-                    edges.replace(w, currentId);
-                    minQueue.remove(w);
-                    minQueue.add(w);
-                }
-            }
-        }
-
-        ArrayList<Long> direction = new ArrayList<>();
-        Long current = destID;
-        while (!current.equals(sourceID) && !current.equals(0L)) {
-            direction.add(0, current);
-            current = edges.get(current);
-        }
-        direction.add(0, sourceID);
-
-        return direction;
-
+        path.addFirst(sid);
+        return path;
     }
 
     /**
