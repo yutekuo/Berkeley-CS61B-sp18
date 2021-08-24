@@ -48,26 +48,22 @@ public class Router {
 
         for (long vid : g.vertices()) {
             distTo.put(vid, Double.POSITIVE_INFINITY);
-            //marked.put(vid, false);
+            marked.put(vid, false);
         }
         distTo.put(sid, 0.0);
         fringe.add(sid);
 
         while (!fringe.isEmpty()) {
             long v = fringe.poll();
+            if (marked.get(v)) {
+                continue;
+            }
             if (v == tid) {
                 break;
             }
-           // marked.put(v, true);
+            marked.put(v, true);
 
             for (long w : g.adjacent(v)) {
-               /* if (!marked.get(w)) {
-                    if (distTo.get(v) + g.distance(v, w) < distTo.get(w)) {
-                        distTo.put(w, distTo.get(v) + g.distance(v, w));
-                        edgeTo.put(w, v);
-                        fringe.add(w);
-                    }
-                }*/
                 if (distTo.get(v) + g.distance(v, w) < distTo.get(w)) {
                     distTo.put(w, distTo.get(v) + g.distance(v, w));
                     edgeTo.put(w, v);
