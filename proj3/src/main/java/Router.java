@@ -59,6 +59,7 @@ public class Router {
                 if (distTo.get(v) + g.distance(v, w) < distTo.get(w)) {
                     distTo.replace(w, distTo.get(v) + g.distance(v, w));
                     edgeTo.replace(w, v);
+                    fringe.remove(w);
                     fringe.add(w);
                 }
             }
